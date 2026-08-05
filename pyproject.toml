@@ -20,6 +20,7 @@ dependencies = [
     "websockets>=13.0",
     "psycopg[binary]>=3.2",
     "mlflow-skinny>=2.16",
+    "duckdb>=1.1",
 ]
 
 [project.optional-dependencies]

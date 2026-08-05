@@ -74,3 +74,39 @@ def log_backtest(
         )
         mlflow.set_tag("halted_reasons_seen", ",".join(result.halted_reasons_seen))
         return str(run.info.run_id)
+
+
+def log_experiment_record(
+    *,
+    dataset_manifest_ids: Sequence[str],
+    feature_manifest_ids: Sequence[str],
+    model_config: dict[str, object],
+    code_git_sha: str,
+    python_lockfile_sha: str,
+    reproducibility_hash: str,
+    tracking_uri: str | None = None,
+    experiment_name: str = "experiments",
+    run_name: str | None = None,
+) -> str:
+    """Log the V1_SPEC ExperimentRecord for a model release / training run.
+
+    Every model release MUST have a matching entry. The reproducibility_hash
+    is stored both as a param (searchable) and as a tag (visible on the run
+    header). Downstream release tooling verifies that two independent runs
+    with the same hash produce byte-identical artifacts.
+    """
+    _mlflow_ready(tracking_uri, experiment_name)
+    with mlflow.start_run(run_name=run_name or reproducibility_hash[:12]) as run:
+        mlflow.log_params(
+            {
+                "dataset_manifest_ids": ",".join(sorted(dataset_manifest_ids)),
+                "feature_manifest_ids": ",".join(sorted(feature_manifest_ids)),
+                "code_git_sha": code_git_sha,
+                "python_lockfile_sha": python_lockfile_sha,
+                "reproducibility_hash": reproducibility_hash,
+            }
+        )
+        # Model config values are stringified so mlflow accepts arbitrary shapes.
+        mlflow.log_params({f"cfg.{k}": str(v) for k, v in sorted(model_config.items())})
+        mlflow.set_tag("reproducibility_hash", reproducibility_hash)
+        return str(run.info.run_id)
