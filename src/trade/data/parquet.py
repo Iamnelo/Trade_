@@ -53,9 +53,9 @@ def klines_to_dataframe(records: Iterable[KlineRecord]) -> pl.DataFrame:
     # Dedupe on the natural key so replayed batches never write duplicate rows;
     # sort last so the on-disk layout is deterministic regardless of unique's
     # internal ordering.
-    return df.unique(
-        subset=["source", "symbol", "interval", "event_time"], keep="last"
-    ).sort("event_time")
+    return df.unique(subset=["source", "symbol", "interval", "event_time"], keep="last").sort(
+        "event_time"
+    )
 
 
 def klines_to_parquet_bytes(records: Iterable[KlineRecord]) -> bytes:

@@ -43,10 +43,12 @@ these phases without per-step approval, escalating only on:
 BTC/ETH stored, live tick stream running for 7 continuous days without a
 gap alert, DQ dashboard live.
 
-## Phase 2 — Research infrastructure
+## Phase 2 — Market Replay Engine + benchmarks
 
-- Minimal event-driven backtester behind the same interfaces (`MarketDataSource`,
-  `RiskManager`, `OrderManager`) that paper/live will use.
+- Event-driven Market Replay Engine behind the same interfaces
+  (`MarketDataSource`, `RiskManager`, `OrderManager`, `ExecutionVenue`) that
+  paper/live will use. Monotonic sim clock; PIT-correct queries enforced at
+  the API surface; deterministic replay of any manifest ID.
 - Realistic costs: taker fee, funding accrual, slippage curve (initialised
   conservatively, updated from live fills later).
 - Walk-forward validation framework with purged/embargoed k-fold.
@@ -56,19 +58,48 @@ gap alert, DQ dashboard live.
   cost-adjusted Sharpe, CVaR.
 - MLflow tracking wired in; research notebook conventions documented.
 
-**Exit criteria**: benchmark suite reproduces expected returns to within a
-tolerance; framework used to publish a "pre-model" baseline report; identical
-run twice bit-for-bit reproducible.
+**Exit criteria**: benchmark suite reproduces expected returns within a
+tolerance; framework used to publish a pre-model baseline report; identical
+run twice is bit-for-bit reproducible.
+
+## Phase 2.5 — Feature Store + versioning + reproducibility (~2 weeks)
+
+- **Offline Feature Store**: DuckDB over content-addressed parquet keyed by
+  `(feature_set_id, entity_id, event_time)`. Feature module contract:
+  declared name, version, inputs, lookback, formula (pure function of inputs
+  at times <= t).
+- **PIT-only training API (HARD REQUIREMENT)**: the ONLY supported way to
+  build a training set is `feature_store.point_in_time_join(...)`. No latest-
+  features shortcut. Adding one is a spec violation.
+- **Feature contract tests (HARD REQUIREMENT)**: every feature module ships
+  with a `hypothesis` property test proving leakage-free behaviour. CI blocks
+  merge without it.
+- **FeatureSetManifest**: SHA-256 per partition, `derived_from` dataset
+  manifest IDs, `feature_spec_sha256`, `code_git_sha`.
+- **ExperimentRecord**: MLflow autolog of dataset/feature manifest IDs,
+  model config hash, code git sha, python lockfile sha.
+- **Reproducibility hash (HARD REQUIREMENT)**: computed for every training
+  run; a model may not be released if the hash cannot be reproduced from
+  committed artifacts.
+
+**Exit criteria**: two independent runs against the same reproducibility
+hash produce byte-identical model artifacts; contract test framework in CI;
+sample feature (e.g., RSI-14) implemented as reference.
+
+**BLOCKS Phase 3.**
 
 ## Phase 3 — Feature engineering and first model
 
-- Feature set v1: returns, volatility (realized + Parkinson), RSI/MACD/ATR
-  family, order-book imbalance from L2 snapshots, funding rate features,
-  cross-asset (BTC-ETH spread, dominance).
+- Feature set v1, materialised into the Phase 2.5 Feature Store: returns,
+  volatility (realized + Parkinson), RSI/MACD/ATR family, order-book
+  imbalance from L2 snapshots, funding-rate features, cross-asset (BTC-ETH
+  spread, dominance). Every feature has a passing contract test.
 - Label design: triple-barrier (Lopez de Prado) with documented leakage
   safeguards.
 - Model v1: LightGBM classifier per (symbol, timeframe); direction +
-  confidence; isotonic calibration on held-out.
+  confidence; isotonic calibration on held-out. Trained EXCLUSIVELY through
+  `feature_store.point_in_time_join(...)`. Every run emits a reproducibility
+  hash.
 - SHAP explanations logged per prediction; top-N features surfaced to the
   future signal payload.
 - Position sizing: fractional Kelly capped at 1/4 Kelly, or fixed-fraction

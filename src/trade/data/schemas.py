@@ -55,7 +55,4 @@ def partition_key(
     month: int,
 ) -> str:
     """Canonical object-storage key for a monthly kline partition."""
-    return (
-        f"raw/{dataset}/{source}/{category}/{symbol}/{interval}/"
-        f"{year:04d}/{month:02d}.parquet"
-    )
+    return f"raw/{dataset}/{source}/{category}/{symbol}/{interval}/{year:04d}/{month:02d}.parquet"

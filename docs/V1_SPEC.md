@@ -63,10 +63,72 @@ bottom of this file.
   - Model prediction is out of the training distribution (PSI-based).
   - AI Health Score drops below the configured floor.
 
+## Feature Store
+
+Two-tier, custom in V1; Feast migration path preserved for V2.
+
+- **Offline (research + training)**: Content-addressed parquet keyed by
+  `(feature_set_id, entity_id, event_time)`, queried via **DuckDB** — embedded,
+  SQL, native parquet, no server. Every feature declares a name + version, its
+  input columns and lookback, and a formula that is a pure function of inputs
+  at times <= t.
+- **Online (live signal delivery, Phase 4+)**: **Redis** hash-per-entity for
+  O(1) latest-feature reads. The online writer subscribes to feature-emitter
+  streams and updates Redis; training and inference share the exact same
+  feature code, never a rewritten copy.
+- **Point-in-time correctness (HARD REQUIREMENT)**: every training pull
+  specifies `as_of_time`; the store returns only features whose
+  `event_time + availability_delay <= as_of_time`. The only supported API for
+  building a training set is `feature_store.point_in_time_join(labels,
+  as_of_column="event_time")`. There is no "latest features" convenience for
+  training. Leakage is the loud path, not the silent one.
+- **Feature contract tests (HARD REQUIREMENT)**: every feature module ships
+  with a `hypothesis`-based property test asserting that for any two input
+  histories identical up to time t, the feature value at t is identical. CI
+  fails without the test.
+
+## Market Replay Engine
+
+The unified engine used for backtesting, walk-forward validation, and — via
+the same interfaces — paper and live trading.
+
+- **Same interfaces as live**: `MarketDataSource`, `RiskManager`,
+  `OrderManager`, `ExecutionVenue`. Only the exchange adapter differs across
+  backtest / paper / live.
+- **Point-in-time correct queries**: the engine holds a monotonic `sim_clock`;
+  every data query returns only records with `event_time <= sim_clock`. The
+  API surface enforces this, not convention.
+- **Deterministic clock advance**: events emitted in `event_time` order, ties
+  broken by a stable secondary key. Replay of the same manifest ID always
+  produces bit-for-bit identical PnL.
+- **Bar-and-tick modes**: V1 runs on bars (hourly signal cadence); the engine
+  supports finer replay (1m or trades) for fill realism without a rewrite.
+- **Realistic fills**: fill logic lives in the `ExecutionVenue` adapter, not
+  the strategy. Slippage curve is a parameter, updated from live fills during
+  Phases 5-6.
+
+Migration to Nautilus Trader is a V2 option and NOT scoped for V1.
+
+## Reproducibility and versioning
+
+- **DatasetManifest**: SHA-256 per partition, coverage bounds. Every backfill
+  produces one.
+- **FeatureSetManifest**: SHA-256 per partition, `derived_from` list of
+  dataset manifest IDs, `feature_spec_sha256`, `code_git_sha`.
+- **ExperimentRecord** (in MLflow): every run auto-logs
+  `dataset_manifest_ids`, `feature_manifest_ids`, `model_config_sha256`,
+  `code_git_sha`, `python_lockfile_sha`.
+- **Reproducibility hash (HARD REQUIREMENT)**: for any model release,
+  `sha256(dataset || features || model_config || code_sha || lockfile_sha)`.
+  Two runs with the same reproducibility hash MUST produce byte-identical
+  models. Release is blocked if the hash cannot be reproduced from committed
+  artifacts.
+
 ## Models
 
 - **Primary**: LightGBM classifier per symbol per timeframe, trained on the
-  signal timeframe with features aggregated from context timeframes.
+  signal timeframe with features aggregated from context timeframes. Features
+  consumed EXCLUSIVELY through the Feature Store's PIT-join API.
 - **Explainability**: SHAP (TreeExplainer) values logged for every prediction.
 - **Calibration**: Isotonic regression fitted on a held-out set; reliability
   diagrams monitored; recalibration triggered on ECE drift.
@@ -96,10 +158,8 @@ risk manager acts on. Components:
 
 ## Backtesting and benchmarking
 
-- **Engine**: Custom minimal event-driven engine implementing the same
-  `MarketDataSource`, `RiskManager`, and `OrderManager` interfaces used in
-  paper/live. Migration to Nautilus Trader is a V2 option and is NOT scoped
-  for V1.
+- **Engine**: See "Market Replay Engine" section above. The same event-driven
+  engine drives every backtest and walk-forward evaluation.
 - **Costs modelled**: taker fee, funding accrual, slippage curve (updated
   from live fills during paper/live phases).
 - **Benchmarks required for every strategy release**:
@@ -152,6 +212,9 @@ risk manager acts on. Components:
 5. Legal review is complete for at least one target rest-of-world jurisdiction.
 6. Subscription platform (Phase 9) has passed a closed beta with at least five
    external users for one month.
+7. Every released model has a matching reproducibility hash and can be
+   rebuilt bit-for-bit from committed artifacts.
+8. Every feature in production ships with a passing contract test in CI.
 
 ## V2+ enhancements (NOT V1)
 

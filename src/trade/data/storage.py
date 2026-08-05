@@ -80,9 +80,7 @@ class LocalStore:
         else:
             base = self._root
         return sorted(
-            self._rel(p)
-            for p in base.rglob("*")
-            if p.is_file() and not p.name.endswith(".tmp")
+            self._rel(p) for p in base.rglob("*") if p.is_file() and not p.name.endswith(".tmp")
         )
 
     def _rel(self, p: Path) -> str:
