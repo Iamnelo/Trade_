@@ -18,6 +18,7 @@ Timing convention:
 from __future__ import annotations
 
 from collections.abc import Sequence
+from itertools import groupby
 
 from trade.data.backfill.common import interval_to_timedelta
 from trade.mre.oms import OrderManager
@@ -45,29 +46,39 @@ def run_backtest(
     # correct across interleaved multi-symbol bars.
     latest_close: dict[str, float] = {}
 
-    for bar in source.iter_bars():
-        # 1. Bar OPEN: fill pending orders at this bar's open price.
-        source.clock.advance_to(bar.event_time)
-        for fill in venue.process_open(
-            symbol=bar.symbol,
-            bar_open_price=bar.open,
-            bar_open_time=bar.event_time,
-        ):
-            oms.apply_fill(fill)
+    # Bars that share an event_time (e.g., BTC and ETH at the same hour) are
+    # processed as a single group so the sim clock advances once per bar-open
+    # and once per bar-close, not per symbol.
+    for event_time, group_iter in groupby(source.iter_bars(), key=lambda b: b.event_time):
+        group = list(group_iter)
 
-        # 2. Bar CLOSE: mark to bar.close, record equity, update RM.
-        source.clock.advance_to(bar.event_time + step)
-        latest_close[bar.symbol] = bar.close
+        # 1. Bar OPEN: fill pending orders for each symbol at that symbol's open.
+        source.clock.advance_to(event_time)
+        for bar in group:
+            for fill in venue.process_open(
+                symbol=bar.symbol,
+                bar_open_price=bar.open,
+                bar_open_time=bar.event_time,
+            ):
+                oms.apply_fill(fill)
+
+        # 2. Bar CLOSE: refresh marks for every symbol in the group, record
+        # equity once, update the risk manager once.
+        source.clock.advance_to(event_time + step)
+        for bar in group:
+            latest_close[bar.symbol] = bar.close
         equity_at_close = oms.equity(latest_close)
-        oms.record_equity(bar.event_time + step, latest_close)
-        rm.update(bar.event_time + step, equity_at_close)
+        oms.record_equity(event_time + step, latest_close)
+        rm.update(event_time + step, equity_at_close)
 
-        # 3. Strategy decides. Risk manager gates. Delta orders queue for next bar.
-        snapshot = oms.snapshot(latest_close)
-        raw_targets = strategy.on_bar(bar, source, snapshot)
-        allowed = rm.gate_targets(raw_targets)
-        new_orders = oms.compute_delta_orders(allowed, submit_time=bar.event_time + step)
-        venue.submit(new_orders)
+        # 3. Strategy decides once per bar in the group. Risk gates. Delta
+        # orders queue for the NEXT bar's open (by that symbol).
+        for bar in group:
+            snapshot = oms.snapshot(latest_close)
+            raw_targets = strategy.on_bar(bar, source, snapshot)
+            allowed = rm.gate_targets(raw_targets)
+            new_orders = oms.compute_delta_orders(allowed, submit_time=event_time + step)
+            venue.submit(new_orders)
 
     equity_history = oms.equity_history()
     final_equity = equity_history[-1].equity if equity_history else config.initial_equity

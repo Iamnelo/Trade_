@@ -19,6 +19,7 @@ dependencies = [
     "tenacity>=8.3",
     "websockets>=13.0",
     "psycopg[binary]>=3.2",
+    "mlflow-skinny>=2.16",
 ]
 
 [project.optional-dependencies]
