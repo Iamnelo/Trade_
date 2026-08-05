@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Tests / linting / typing
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+.tox/
+
+# Virtual envs
+.venv/
+venv/
+env/
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+
+# Editors / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Data / models / experiment tracking — never commit these
+data/
+models/
+mlruns/
+mlartifacts/
+*.parquet
+*.duckdb
+*.db
+*.sqlite
+
+# Docker volumes
+ops/data/
