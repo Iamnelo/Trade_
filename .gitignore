@@ -45,11 +45,12 @@ env/
 *.swp
 .DS_Store
 
-# Data / models / experiment tracking — never commit these
-data/
-models/
-mlruns/
-mlartifacts/
+# Data / models / experiment tracking — never commit these.
+# Anchor to repo root so `src/trade/data/` (source code) is NOT ignored.
+/data/
+/models/
+/mlruns/
+/mlartifacts/
 *.parquet
 *.duckdb
 *.db
