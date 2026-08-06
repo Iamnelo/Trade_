@@ -1,0 +1,110 @@
+"""LightGBM 3-class classifier for {-1, 0, +1} triple-barrier labels.
+
+Labels are mapped to LightGBM's expected integer range [0, num_class) as:
+
+    -1  -> 0  (DOWN)
+     0  -> 1  (FLAT)
+    +1  -> 2  (UP)
+
+`predict_proba` returns a dict keyed by "down"/"flat"/"up" to keep call
+sites clear and to avoid strategy code hard-coding integer indices.
+
+Missing feature values (`None` in TrainingFrame) are passed to LightGBM as
+NaN; LGBM handles them natively via its default missing-value routing.
+"""
+
+from __future__ import annotations
+
+from collections.abc import Mapping, Sequence
+from typing import Any
+
+import numpy as np
+from lightgbm import LGBMClassifier
+
+from trade.features.types import TrainingFrame
+
+_DEFAULT_PARAMS: dict[str, Any] = {
+    "objective": "multiclass",
+    "num_class": 3,
+    "learning_rate": 0.05,
+    "num_leaves": 15,
+    "min_data_in_leaf": 5,
+    "n_estimators": 100,
+    "verbose": -1,
+    "random_state": 42,
+    "deterministic": True,
+    "force_row_wise": True,
+}
+
+_CLASS_NAMES = ("down", "flat", "up")
+
+
+def _label_to_int(label: float) -> int:
+    # -1 -> 0, 0 -> 1, +1 -> 2. Anything else raises.
+    if label == -1.0:
+        return 0
+    if label == 0.0:
+        return 1
+    if label == 1.0:
+        return 2
+    raise ValueError(f"unexpected label value {label!r}; expected -1, 0, or 1")
+
+
+def training_frame_to_xy(
+    frame: TrainingFrame,
+    feature_ids: Sequence[str],
+) -> tuple[np.ndarray, np.ndarray]:
+    n = frame.n_rows
+    m = len(feature_ids)
+    x = np.full((n, m), np.nan, dtype=np.float64)
+    for j, fid in enumerate(feature_ids):
+        column = frame.features.get(fid, ())
+        for i, v in enumerate(column):
+            if v is not None:
+                x[i, j] = v
+    y = np.array([_label_to_int(v) for v in frame.labels], dtype=np.int64)
+    return x, y
+
+
+class LightGBMClassifierV1:
+    def __init__(self, *, params: Mapping[str, Any] | None = None) -> None:
+        self._params: dict[str, Any] = dict(_DEFAULT_PARAMS)
+        if params:
+            self._params.update(params)
+        self._model: LGBMClassifier | None = None
+        self._feature_ids: tuple[str, ...] = ()
+
+    @property
+    def feature_ids(self) -> tuple[str, ...]:
+        return self._feature_ids
+
+    @property
+    def params(self) -> dict[str, Any]:
+        return dict(self._params)
+
+    def fit(self, *, frame: TrainingFrame, feature_ids: Sequence[str]) -> None:
+        x, y = training_frame_to_xy(frame, feature_ids)
+        if x.shape[0] == 0:
+            raise ValueError("training frame is empty; cannot fit")
+        model = LGBMClassifier(**self._params)
+        model.fit(x, y)
+        self._model = model
+        self._feature_ids = tuple(feature_ids)
+
+    def predict_proba_matrix(self, frame: TrainingFrame) -> np.ndarray:
+        if self._model is None:
+            raise RuntimeError("model has not been fit")
+        x, _ = training_frame_to_xy(frame, self._feature_ids)
+        # LGBM aligns columns to fitted feature order via feature_ids we own.
+        probs = self._model.predict_proba(x)
+        return np.asarray(probs, dtype=np.float64)
+
+    def predict_proba_single(self, feature_vector: Mapping[str, float]) -> dict[str, float]:
+        if self._model is None:
+            raise RuntimeError("model has not been fit")
+        x = np.array(
+            [[feature_vector.get(fid, float("nan")) for fid in self._feature_ids]],
+            dtype=np.float64,
+        )
+        row = np.asarray(self._model.predict_proba(x), dtype=np.float64)[0]
+        return {name: float(row[i]) for i, name in enumerate(_CLASS_NAMES)}

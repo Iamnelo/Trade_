@@ -21,6 +21,9 @@ dependencies = [
     "psycopg[binary]>=3.2",
     "mlflow-skinny>=2.16",
     "duckdb>=1.1",
+    "lightgbm>=4.5",
+    "scikit-learn>=1.5",
+    "numpy>=1.26",
 ]
 
 [project.optional-dependencies]
@@ -97,6 +100,12 @@ warn_return_any = false
 # tests assert the behaviour.
 [[tool.mypy.overrides]]
 module = ["boto3", "botocore", "botocore.*"]
+ignore_missing_imports = true
+
+# scikit-learn ships without a py.typed marker; wrapping surface is small and
+# our own IsotonicCalibrator has explicit annotations.
+[[tool.mypy.overrides]]
+module = ["sklearn.*"]
 ignore_missing_imports = true
 
 # ---------------------------------------------------------------------------
