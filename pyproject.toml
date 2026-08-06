@@ -108,6 +108,12 @@ ignore_missing_imports = true
 module = ["sklearn.*"]
 ignore_missing_imports = true
 
+# joblib is untyped upstream; our persistence layer casts loaded objects
+# to the concrete types they were saved from.
+[[tool.mypy.overrides]]
+module = ["joblib"]
+ignore_missing_imports = true
+
 # ---------------------------------------------------------------------------
 # Pytest
 # ---------------------------------------------------------------------------
@@ -120,6 +126,9 @@ filterwarnings = [
     "ignore::DeprecationWarning:pydantic.*",
     "ignore::DeprecationWarning:botocore.*",
     "ignore::DeprecationWarning:polars.*",
+    # joblib's numpy_pickle still assigns to `.shape` on load — deprecated
+    # in NumPy 2.5 but harmless. Remove when joblib fixes upstream.
+    "ignore::DeprecationWarning:joblib.*",
 ]
 
 [tool.coverage.run]

@@ -18,7 +18,9 @@ import typer
 
 from trade.data.manifest import DatasetManifest
 from trade.data.storage import LocalStore
+from trade.features.catalog import build_features
 from trade.metrics.performance import HOURS_PER_YEAR, PerformanceReport, summarize
+from trade.model.persistence import load_training_artifacts
 from trade.mre.backtest import run_backtest
 from trade.mre.clock import SimClock
 from trade.mre.source import MarketReplaySource
@@ -27,6 +29,7 @@ from trade.mre.types import BacktestConfig
 from trade.research.oracle import capture_ratio, oracle_max_pnl
 from trade.strategies.buy_hold import BuyAndHoldStrategy
 from trade.strategies.ma_cross import MACrossStrategy
+from trade.strategies.model_driven import ModelDrivenStrategy
 from trade.strategies.momentum import Momentum12_1Strategy
 from trade.strategies.random_signal import RandomSignalStrategy
 from trade.strategies.risk_parity import RiskParityStrategy
@@ -43,6 +46,29 @@ _BUILDERS: dict[str, StrategyBuilder] = {
     "momentum": lambda symbol, interval: Momentum12_1Strategy(symbol=symbol, interval=interval),
     "random": lambda symbol, interval: RandomSignalStrategy(symbol=symbol, interval=interval),
 }
+
+
+def _build_model_driven(
+    *,
+    symbol: str,
+    interval: str,
+    model_path: Path,
+    confidence_threshold: float,
+    notional_fraction: float,
+    allow_short: bool,
+) -> Strategy:
+    artifacts = load_training_artifacts(model_path)
+    features = build_features(artifacts.feature_ids)
+    return ModelDrivenStrategy(
+        symbol=symbol,
+        interval=interval,
+        model=artifacts.model,
+        features=features,
+        calibrator=artifacts.calibrator,
+        confidence_threshold=confidence_threshold,
+        notional_fraction=notional_fraction,
+        allow_short=allow_short,
+    )
 
 
 def _load_source(
@@ -77,7 +103,7 @@ def _report_to_dict(report: PerformanceReport) -> dict[str, Any]:
 
 @backtest_app.command("run")
 def run(
-    strategy: str = typer.Option(..., help="Strategy key from the registry."),
+    strategy: str = typer.Option(..., help="Strategy key from the registry, or 'model_driven'."),
     symbol: str = typer.Option("BTCUSDT"),
     interval: str = typer.Option("60"),
     manifest_path: Path = typer.Option(...),
@@ -88,18 +114,45 @@ def run(
     output_json: Path | None = typer.Option(None, help="Write PerformanceReport JSON here."),
     mlflow_uri: str | None = typer.Option(None, help="MLflow tracking URI to log into."),
     experiment: str = typer.Option("backtests"),
+    model_path: Path | None = typer.Option(
+        None, help="Required when --strategy model_driven: path to saved TrainingArtifacts."
+    ),
+    confidence_threshold: float = typer.Option(
+        0.55, help="Model strategy: minimum argmax prob to take a position."
+    ),
+    notional_fraction: float = typer.Option(
+        0.5, help="Model strategy: fraction of equity to deploy per position."
+    ),
+    allow_short: bool = typer.Option(True, help="Model strategy: allow short positions."),
 ) -> None:
     """Run one backtest against a stored manifest."""
-    builder = _BUILDERS.get(strategy)
-    if builder is None:
-        raise typer.BadParameter(f"unknown strategy {strategy!r}; choose from: {sorted(_BUILDERS)}")
+    if strategy == "model_driven":
+        if model_path is None:
+            raise typer.BadParameter("--model-path is required when --strategy model_driven")
+        strategy_instance = _build_model_driven(
+            symbol=symbol,
+            interval=interval,
+            model_path=model_path,
+            confidence_threshold=confidence_threshold,
+            notional_fraction=notional_fraction,
+            allow_short=allow_short,
+        )
+    else:
+        builder = _BUILDERS.get(strategy)
+        if builder is None:
+            raise typer.BadParameter(
+                f"unknown strategy {strategy!r}; choose from: "
+                f"{sorted([*_BUILDERS, 'model_driven'])}"
+            )
+        strategy_instance = builder(symbol, interval)
+
     source, manifest = _load_source(
         manifest_path=manifest_path, local_dir=local_dir, interval=interval, symbol=symbol
     )
     config = BacktestConfig(
         initial_equity=initial_equity, fee_bps=fee_bps, slippage_bps=slippage_bps
     )
-    result = run_backtest(source=source, strategy=builder(symbol, interval), config=config)
+    result = run_backtest(source=source, strategy=strategy_instance, config=config)
     report = summarize(
         equity_curve=result.equity_curve,
         fills=result.fills,
@@ -137,6 +190,12 @@ def benchmark_suite(
     output_json: Path = typer.Option(...),
     include_risk_parity: bool = typer.Option(False, help="Requires --secondary-symbol"),
     secondary_symbol: str = typer.Option("ETHUSDT"),
+    model_path: Path | None = typer.Option(
+        None, help="Path to saved model artifacts; when set, includes model_lgbm in the suite."
+    ),
+    model_confidence_threshold: float = typer.Option(0.55),
+    model_notional_fraction: float = typer.Option(0.5),
+    model_allow_short: bool = typer.Option(True),
 ) -> None:
     """Run every V1 benchmark against the same manifest and write a JSON baseline report.
 
@@ -180,6 +239,21 @@ def benchmark_suite(
                 "risk_parity",
                 RiskParityStrategy(symbols=[symbol, secondary_symbol], interval=interval),
                 fresh_source(None),
+            )
+        )
+    if model_path is not None:
+        strategies.append(
+            (
+                "model_lgbm",
+                _build_model_driven(
+                    symbol=symbol,
+                    interval=interval,
+                    model_path=model_path,
+                    confidence_threshold=model_confidence_threshold,
+                    notional_fraction=model_notional_fraction,
+                    allow_short=model_allow_short,
+                ),
+                fresh_source(symbol),
             )
         )
 
