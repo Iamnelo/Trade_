@@ -7,22 +7,16 @@ separate module and lands in Phase 1.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from datetime import datetime
 from types import TracebackType
 from typing import Any, Self
 
 import httpx
 
-from trade.exchanges.base import Kline, MarketDataSource
+from trade.exchanges.base import FundingTick, Kline, MarketDataSource
 from trade.utils.clock import from_epoch_ms, to_epoch_ms
 
-
-@dataclass(frozen=True, slots=True)
-class FundingTick:
-    symbol: str
-    event_time: datetime  # settlement timestamp
-    funding_rate: float
+__all__ = ["BybitPublicClient", "FundingTick"]
 
 
 _VALID_INTERVALS = frozenset(

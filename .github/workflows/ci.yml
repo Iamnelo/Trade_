@@ -43,10 +43,11 @@ jobs:
 
       # HARD REQUIREMENT: every concrete feature module in
       # src/trade/features/definitions/ must have at least one test that
-      # calls assert_feature_contract. The check is deliberately simple —
-      # if a feature has NO test file matching its module name, the check
-      # fails; if the test exists but lacks assert_feature_contract, it
-      # also fails.
+      # calls assert_feature_contract (single-symbol) or
+      # assert_multi_symbol_feature_contract (cross-asset). The check is
+      # deliberately simple — if a feature has NO test file matching its
+      # module name, the check fails; if the test exists but lacks the
+      # contract call, it also fails.
       - name: Feature contract discipline
         run: |
           set -euo pipefail
@@ -59,8 +60,8 @@ jobs:
               missing+=("$test_file (no test file for feature '$base')")
               continue
             fi
-            if ! grep -q "assert_feature_contract" "$test_file"; then
-              missing+=("$test_file (test file exists but does not call assert_feature_contract)")
+            if ! grep -qE "assert_feature_contract|assert_multi_symbol_feature_contract" "$test_file"; then
+              missing+=("$test_file (test file exists but does not call assert_feature_contract or assert_multi_symbol_feature_contract)")
             fi
           done
           if [ "${#missing[@]}" -ne 0 ]; then

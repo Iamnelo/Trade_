@@ -25,6 +25,15 @@ class Kline:
     turnover: float
 
 
+@dataclass(frozen=True, slots=True)
+class FundingTick:
+    """A single funding-rate settlement returned by a venue's public API."""
+
+    symbol: str
+    event_time: datetime  # settlement wall-clock (UTC-aware)
+    funding_rate: float
+
+
 class MarketDataSource(ABC):
     @abstractmethod
     async def fetch_klines(

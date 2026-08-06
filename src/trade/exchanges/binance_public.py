@@ -12,7 +12,7 @@ from typing import Any, Self
 
 import httpx
 
-from trade.exchanges.base import Kline, MarketDataSource
+from trade.exchanges.base import FundingTick, Kline, MarketDataSource
 from trade.utils.clock import from_epoch_ms, to_epoch_ms
 
 # The CLI accepts Bybit-style intervals ("60") and this table maps them across.
@@ -33,6 +33,7 @@ _BYBIT_TO_BINANCE_INTERVAL: dict[str, str] = {
 }
 _MIN_LIMIT = 1
 _MAX_LIMIT = 1500  # Binance futures kline max
+_MAX_FUNDING_LIMIT = 1000  # Binance futures funding-rate max
 
 
 class BinancePublicClient(MarketDataSource):
@@ -107,6 +108,39 @@ class BinancePublicClient(MarketDataSource):
                 close=float(row[4]),
                 volume=float(row[5]),
                 turnover=float(row[7]),
+            )
+            for row in rows
+        ]
+
+    async def fetch_funding_history(
+        self,
+        symbol: str,
+        *,
+        start: datetime | None = None,
+        end: datetime | None = None,
+        limit: int = 1000,
+    ) -> list[FundingTick]:
+        """Binance USDT-M perp /fapi/v1/fundingRate — max 1000 rows per call, ASC by time."""
+        if not 1 <= limit <= _MAX_FUNDING_LIMIT:
+            raise ValueError(f"limit must be within [1, {_MAX_FUNDING_LIMIT}]")
+
+        params: dict[str, Any] = {"symbol": symbol, "limit": limit}
+        if start is not None:
+            params["startTime"] = to_epoch_ms(start)
+        if end is not None:
+            params["endTime"] = to_epoch_ms(end)
+
+        response = await self._client.get(f"{self._base_url}/fapi/v1/fundingRate", params=params)
+        response.raise_for_status()
+        rows = response.json()
+        if not isinstance(rows, list):
+            raise RuntimeError(f"Binance funding returned unexpected payload: {rows!r}")
+
+        return [
+            FundingTick(
+                symbol=str(row.get("symbol", symbol)),
+                event_time=from_epoch_ms(int(row["fundingTime"])),
+                funding_rate=float(row["fundingRate"]),
             )
             for row in rows
         ]
