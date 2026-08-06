@@ -108,3 +108,29 @@ class LightGBMClassifierV1:
         )
         row = np.asarray(self._model.predict_proba(x), dtype=np.float64)[0]
         return {name: float(row[i]) for i, name in enumerate(_CLASS_NAMES)}
+
+    def pred_contrib_single(self, feature_vector: Mapping[str, float]) -> np.ndarray:
+        """LightGBM SHAP contributions for a single feature vector.
+
+        Returns a `(n_classes, n_features + 1)` array. Column j <= n_features-1
+        is the contribution of `feature_ids[j]`; the last column is the base
+        value (expected model output for the class). Sum of contributions
+        approximates the class logit.
+        """
+        if self._model is None:
+            raise RuntimeError("model has not been fit")
+        x = np.array(
+            [[feature_vector.get(fid, float("nan")) for fid in self._feature_ids]],
+            dtype=np.float64,
+        )
+        raw = self._model.booster_.predict(x, pred_contrib=True)
+        arr = np.asarray(raw, dtype=np.float64)
+        # LGBM returns shape (1, n_classes * (n_features + 1)) for multiclass.
+        n_feats = len(self._feature_ids)
+        n_classes = len(_CLASS_NAMES)
+        expected_cols = n_classes * (n_feats + 1)
+        if arr.shape != (1, expected_cols):
+            raise RuntimeError(
+                f"unexpected pred_contrib shape {arr.shape}; expected (1, {expected_cols})"
+            )
+        return arr.reshape(n_classes, n_feats + 1)

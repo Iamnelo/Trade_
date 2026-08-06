@@ -44,6 +44,28 @@ class KlineRecord:
     turnover: float
 
 
+# Canonical column order for funding parquet. Funding rows are event-driven
+# (not bar-aligned): one row per funding settlement.
+FUNDING_COLUMNS: tuple[str, ...] = (
+    "source",
+    "category",
+    "symbol",
+    "event_time",
+    "ingest_time",
+    "funding_rate",
+)
+
+
+@dataclass(frozen=True, slots=True)
+class FundingRecord:
+    source: str
+    category: str
+    symbol: str
+    event_time: datetime  # settlement time (typically 00:00 / 08:00 / 16:00 UTC)
+    ingest_time: datetime
+    funding_rate: float
+
+
 def partition_key(
     *,
     dataset: str,

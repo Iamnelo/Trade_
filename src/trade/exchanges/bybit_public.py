@@ -7,6 +7,7 @@ separate module and lands in Phase 1.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import datetime
 from types import TracebackType
 from typing import Any, Self
@@ -16,11 +17,20 @@ import httpx
 from trade.exchanges.base import Kline, MarketDataSource
 from trade.utils.clock import from_epoch_ms, to_epoch_ms
 
+
+@dataclass(frozen=True, slots=True)
+class FundingTick:
+    symbol: str
+    event_time: datetime  # settlement timestamp
+    funding_rate: float
+
+
 _VALID_INTERVALS = frozenset(
     {"1", "3", "5", "15", "30", "60", "120", "240", "360", "720", "D", "M", "W"}
 )
 _MIN_LIMIT = 1
 _MAX_LIMIT = 1000
+_MAX_FUNDING_LIMIT = 200
 
 
 class BybitPublicClient(MarketDataSource):
@@ -89,6 +99,53 @@ class BybitPublicClient(MarketDataSource):
 
         rows: list[list[str]] = payload.get("result", {}).get("list", [])
         return [_parse_kline(row, symbol=symbol, interval=interval) for row in rows]
+
+    async def fetch_funding_history(
+        self,
+        symbol: str,
+        *,
+        start: datetime | None = None,
+        end: datetime | None = None,
+        limit: int = 200,
+    ) -> list[FundingTick]:
+        """Bybit v5 /market/funding/history — max 200 rows per call, DESC by time.
+
+        The returned `event_time` is the funding SETTLEMENT time; each rate is
+        knowable at that instant, so downstream materialisation sets the
+        feature's `availability_time = event_time`.
+        """
+        if not 1 <= limit <= _MAX_FUNDING_LIMIT:
+            raise ValueError(f"limit must be within [1, {_MAX_FUNDING_LIMIT}]")
+
+        params: dict[str, Any] = {
+            "category": self._category,
+            "symbol": symbol,
+            "limit": limit,
+        }
+        if start is not None:
+            params["startTime"] = to_epoch_ms(start)
+        if end is not None:
+            params["endTime"] = to_epoch_ms(end)
+
+        response = await self._client.get(
+            f"{self._base_url}/v5/market/funding/history", params=params
+        )
+        response.raise_for_status()
+        payload = response.json()
+        if payload.get("retCode") != 0:
+            raise RuntimeError(
+                "Bybit funding error retCode="
+                f"{payload.get('retCode')} retMsg={payload.get('retMsg')!r}"
+            )
+        rows: list[dict[str, str]] = payload.get("result", {}).get("list", [])
+        return [
+            FundingTick(
+                symbol=str(row.get("symbol", symbol)),
+                event_time=from_epoch_ms(int(row["fundingRateTimestamp"])),
+                funding_rate=float(row["fundingRate"]),
+            )
+            for row in rows
+        ]
 
 
 def _parse_kline(row: list[str], *, symbol: str, interval: str) -> Kline:
