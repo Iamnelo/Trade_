@@ -1,0 +1,1506 @@
+{
+  "base_spec": {
+    "name": "btc_combined_winners_v1",
+    "data": {
+      "csv_path": "BTCUSDT_60_2y.csv",
+      "symbol": "BTCUSDT",
+      "interval": "60"
+    },
+    "features": [
+      "log_return@5",
+      "realized_vol@20",
+      "atr@14",
+      "macd_hist@12_26_9",
+      "rsi_close@14",
+      "time_of_day@sin",
+      "time_of_day@cos",
+      "day_of_week@sin",
+      "day_of_week@cos",
+      "return_skew@20",
+      "return_kurtosis@20",
+      "vol_regime@20_120"
+    ],
+    "label": {
+      "kind": "triple_barrier",
+      "horizon_bars": 6,
+      "up_pct": 0.01,
+      "down_pct": 0.01
+    },
+    "model": {
+      "n_estimators": 100,
+      "learning_rate": 0.05,
+      "num_leaves": 15,
+      "min_data_in_leaf": 5,
+      "max_depth": -1,
+      "calibration_fraction": 0.2
+    },
+    "strategy": {
+      "confidence_threshold": 0.55,
+      "notional_fraction": 0.5,
+      "allow_short": true
+    },
+    "wfo": {
+      "train_bars": 8640,
+      "test_bars": 1440,
+      "step_bars": 1440,
+      "expanding": false
+    },
+    "backtest": {
+      "initial_equity": 10000.0,
+      "fee_bps": 5.5,
+      "slippage_bps": 5.0,
+      "bars_per_year": 8760
+    },
+    "gates": {
+      "max_fold_drawdown_pct": 15.0,
+      "min_pct_folds_positive_cas": 0.5,
+      "min_fills_per_fold": 0,
+      "min_folds_with_trades": 3,
+      "max_annualized_turnover": 50.0
+    }
+  },
+  "thresholds": [
+    0.55,
+    0.6,
+    0.65,
+    0.7,
+    0.75,
+    0.8
+  ],
+  "generated_at": "2026-08-07T16:31:18.889719+00:00",
+  "code_git_sha": "d13beca4a0ca239c8ad80e18267edc8884a56919",
+  "lockfile_sha": "9750eaffca2c952090be8a24a3176cb3b3eaf8da2eb4e50c54d29f43d130b436",
+  "n_bars": 17520,
+  "per_fold_classifier": [
+    {
+      "fold_index": 0,
+      "reproducibility_hash": "c2b3373c18c2f33e9acc02f2c02eedebe99a257c8d9b7ed16a22b6574323920f",
+      "diagnostics": {
+        "n_test_samples": 1434,
+        "auc_roc_macro": 0.6385908457214097,
+        "auc_pr_macro": 0.4132981084266367,
+        "ece_macro": 0.03421673456623223,
+        "class_support": [
+          237,
+          992,
+          205
+        ]
+      }
+    },
+    {
+      "fold_index": 1,
+      "reproducibility_hash": "c2b3373c18c2f33e9acc02f2c02eedebe99a257c8d9b7ed16a22b6574323920f",
+      "diagnostics": {
+        "n_test_samples": 1434,
+        "auc_roc_macro": 0.671484815403829,
+        "auc_pr_macro": 0.4867798239380023,
+        "ece_macro": 0.12207614346233035,
+        "class_support": [
+          468,
+          570,
+          396
+        ]
+      }
+    },
+    {
+      "fold_index": 2,
+      "reproducibility_hash": "c2b3373c18c2f33e9acc02f2c02eedebe99a257c8d9b7ed16a22b6574323920f",
+      "diagnostics": {
+        "n_test_samples": 1434,
+        "auc_roc_macro": 0.7048745544138347,
+        "auc_pr_macro": 0.4916811769051716,
+        "ece_macro": 0.046945595762901964,
+        "class_support": [
+          339,
+          777,
+          318
+        ]
+      }
+    },
+    {
+      "fold_index": 3,
+      "reproducibility_hash": "c2b3373c18c2f33e9acc02f2c02eedebe99a257c8d9b7ed16a22b6574323920f",
+      "diagnostics": {
+        "n_test_samples": 1434,
+        "auc_roc_macro": 0.6384386622531438,
+        "auc_pr_macro": 0.4522133182218681,
+        "ece_macro": 0.08763216172387299,
+        "class_support": [
+          571,
+          380,
+          483
+        ]
+      }
+    },
+    {
+      "fold_index": 4,
+      "reproducibility_hash": "c2b3373c18c2f33e9acc02f2c02eedebe99a257c8d9b7ed16a22b6574323920f",
+      "diagnostics": {
+        "n_test_samples": 1434,
+        "auc_roc_macro": 0.6347456036384131,
+        "auc_pr_macro": 0.4385854782480874,
+        "ece_macro": 0.0875811577024211,
+        "class_support": [
+          303,
+          805,
+          326
+        ]
+      }
+    },
+    {
+      "fold_index": 5,
+      "reproducibility_hash": "c2b3373c18c2f33e9acc02f2c02eedebe99a257c8d9b7ed16a22b6574323920f",
+      "diagnostics": {
+        "n_test_samples": 1434,
+        "auc_roc_macro": 0.6873404927514509,
+        "auc_pr_macro": 0.4938430335023188,
+        "ece_macro": 0.052504317087057904,
+        "class_support": [
+          424,
+          704,
+          306
+        ]
+      }
+    }
+  ],
+  "per_cell": [
+    {
+      "fold_index": 0,
+      "threshold": 0.55,
+      "n_fills": 0,
+      "total_return_pct": 0.0,
+      "sharpe": 0.0,
+      "sortino": 0.0,
+      "cost_adjusted_sharpe": 0.0,
+      "max_drawdown_pct": 0.0,
+      "hit_rate": 0.0,
+      "turnover": 0.0,
+      "trade_metrics": {
+        "n_trades": 0,
+        "n_wins": 0,
+        "n_losses": 0,
+        "win_rate": 0.0,
+        "avg_win_pnl": 0.0,
+        "avg_loss_pnl": 0.0,
+        "largest_win_pnl": 0.0,
+        "largest_loss_pnl": 0.0,
+        "expectancy_per_trade": 0.0,
+        "profit_factor": 0.0,
+        "total_pnl": 0.0
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 10000.0,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 46595.32010546636,
+        "oracle_final_equity_long_short": 219201.00963356483,
+        "capture_ratio_vs_long_only": 0.0,
+        "capture_ratio_vs_long_short": 0.0
+      }
+    },
+    {
+      "fold_index": 0,
+      "threshold": 0.6,
+      "n_fills": 0,
+      "total_return_pct": 0.0,
+      "sharpe": 0.0,
+      "sortino": 0.0,
+      "cost_adjusted_sharpe": 0.0,
+      "max_drawdown_pct": 0.0,
+      "hit_rate": 0.0,
+      "turnover": 0.0,
+      "trade_metrics": {
+        "n_trades": 0,
+        "n_wins": 0,
+        "n_losses": 0,
+        "win_rate": 0.0,
+        "avg_win_pnl": 0.0,
+        "avg_loss_pnl": 0.0,
+        "largest_win_pnl": 0.0,
+        "largest_loss_pnl": 0.0,
+        "expectancy_per_trade": 0.0,
+        "profit_factor": 0.0,
+        "total_pnl": 0.0
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 10000.0,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 46595.32010546636,
+        "oracle_final_equity_long_short": 219201.00963356483,
+        "capture_ratio_vs_long_only": 0.0,
+        "capture_ratio_vs_long_short": 0.0
+      }
+    },
+    {
+      "fold_index": 0,
+      "threshold": 0.65,
+      "n_fills": 0,
+      "total_return_pct": 0.0,
+      "sharpe": 0.0,
+      "sortino": 0.0,
+      "cost_adjusted_sharpe": 0.0,
+      "max_drawdown_pct": 0.0,
+      "hit_rate": 0.0,
+      "turnover": 0.0,
+      "trade_metrics": {
+        "n_trades": 0,
+        "n_wins": 0,
+        "n_losses": 0,
+        "win_rate": 0.0,
+        "avg_win_pnl": 0.0,
+        "avg_loss_pnl": 0.0,
+        "largest_win_pnl": 0.0,
+        "largest_loss_pnl": 0.0,
+        "expectancy_per_trade": 0.0,
+        "profit_factor": 0.0,
+        "total_pnl": 0.0
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 10000.0,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 46595.32010546636,
+        "oracle_final_equity_long_short": 219201.00963356483,
+        "capture_ratio_vs_long_only": 0.0,
+        "capture_ratio_vs_long_short": 0.0
+      }
+    },
+    {
+      "fold_index": 0,
+      "threshold": 0.7,
+      "n_fills": 0,
+      "total_return_pct": 0.0,
+      "sharpe": 0.0,
+      "sortino": 0.0,
+      "cost_adjusted_sharpe": 0.0,
+      "max_drawdown_pct": 0.0,
+      "hit_rate": 0.0,
+      "turnover": 0.0,
+      "trade_metrics": {
+        "n_trades": 0,
+        "n_wins": 0,
+        "n_losses": 0,
+        "win_rate": 0.0,
+        "avg_win_pnl": 0.0,
+        "avg_loss_pnl": 0.0,
+        "largest_win_pnl": 0.0,
+        "largest_loss_pnl": 0.0,
+        "expectancy_per_trade": 0.0,
+        "profit_factor": 0.0,
+        "total_pnl": 0.0
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 10000.0,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 46595.32010546636,
+        "oracle_final_equity_long_short": 219201.00963356483,
+        "capture_ratio_vs_long_only": 0.0,
+        "capture_ratio_vs_long_short": 0.0
+      }
+    },
+    {
+      "fold_index": 0,
+      "threshold": 0.75,
+      "n_fills": 0,
+      "total_return_pct": 0.0,
+      "sharpe": 0.0,
+      "sortino": 0.0,
+      "cost_adjusted_sharpe": 0.0,
+      "max_drawdown_pct": 0.0,
+      "hit_rate": 0.0,
+      "turnover": 0.0,
+      "trade_metrics": {
+        "n_trades": 0,
+        "n_wins": 0,
+        "n_losses": 0,
+        "win_rate": 0.0,
+        "avg_win_pnl": 0.0,
+        "avg_loss_pnl": 0.0,
+        "largest_win_pnl": 0.0,
+        "largest_loss_pnl": 0.0,
+        "expectancy_per_trade": 0.0,
+        "profit_factor": 0.0,
+        "total_pnl": 0.0
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 10000.0,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 46595.32010546636,
+        "oracle_final_equity_long_short": 219201.00963356483,
+        "capture_ratio_vs_long_only": 0.0,
+        "capture_ratio_vs_long_short": 0.0
+      }
+    },
+    {
+      "fold_index": 0,
+      "threshold": 0.8,
+      "n_fills": 0,
+      "total_return_pct": 0.0,
+      "sharpe": 0.0,
+      "sortino": 0.0,
+      "cost_adjusted_sharpe": 0.0,
+      "max_drawdown_pct": 0.0,
+      "hit_rate": 0.0,
+      "turnover": 0.0,
+      "trade_metrics": {
+        "n_trades": 0,
+        "n_wins": 0,
+        "n_losses": 0,
+        "win_rate": 0.0,
+        "avg_win_pnl": 0.0,
+        "avg_loss_pnl": 0.0,
+        "largest_win_pnl": 0.0,
+        "largest_loss_pnl": 0.0,
+        "expectancy_per_trade": 0.0,
+        "profit_factor": 0.0,
+        "total_pnl": 0.0
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 10000.0,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 46595.32010546636,
+        "oracle_final_equity_long_short": 219201.00963356483,
+        "capture_ratio_vs_long_only": 0.0,
+        "capture_ratio_vs_long_short": 0.0
+      }
+    },
+    {
+      "fold_index": 1,
+      "threshold": 0.55,
+      "n_fills": 0,
+      "total_return_pct": 0.0,
+      "sharpe": 0.0,
+      "sortino": 0.0,
+      "cost_adjusted_sharpe": 0.0,
+      "max_drawdown_pct": 0.0,
+      "hit_rate": 0.0,
+      "turnover": 0.0,
+      "trade_metrics": {
+        "n_trades": 0,
+        "n_wins": 0,
+        "n_losses": 0,
+        "win_rate": 0.0,
+        "avg_win_pnl": 0.0,
+        "avg_loss_pnl": 0.0,
+        "largest_win_pnl": 0.0,
+        "largest_loss_pnl": 0.0,
+        "expectancy_per_trade": 0.0,
+        "profit_factor": 0.0,
+        "total_pnl": 0.0
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 10000.0,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 114876.86872968526,
+        "oracle_final_equity_long_short": 1662923.281928573,
+        "capture_ratio_vs_long_only": 0.0,
+        "capture_ratio_vs_long_short": 0.0
+      }
+    },
+    {
+      "fold_index": 1,
+      "threshold": 0.6,
+      "n_fills": 0,
+      "total_return_pct": 0.0,
+      "sharpe": 0.0,
+      "sortino": 0.0,
+      "cost_adjusted_sharpe": 0.0,
+      "max_drawdown_pct": 0.0,
+      "hit_rate": 0.0,
+      "turnover": 0.0,
+      "trade_metrics": {
+        "n_trades": 0,
+        "n_wins": 0,
+        "n_losses": 0,
+        "win_rate": 0.0,
+        "avg_win_pnl": 0.0,
+        "avg_loss_pnl": 0.0,
+        "largest_win_pnl": 0.0,
+        "largest_loss_pnl": 0.0,
+        "expectancy_per_trade": 0.0,
+        "profit_factor": 0.0,
+        "total_pnl": 0.0
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 10000.0,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 114876.86872968526,
+        "oracle_final_equity_long_short": 1662923.281928573,
+        "capture_ratio_vs_long_only": 0.0,
+        "capture_ratio_vs_long_short": 0.0
+      }
+    },
+    {
+      "fold_index": 1,
+      "threshold": 0.65,
+      "n_fills": 0,
+      "total_return_pct": 0.0,
+      "sharpe": 0.0,
+      "sortino": 0.0,
+      "cost_adjusted_sharpe": 0.0,
+      "max_drawdown_pct": 0.0,
+      "hit_rate": 0.0,
+      "turnover": 0.0,
+      "trade_metrics": {
+        "n_trades": 0,
+        "n_wins": 0,
+        "n_losses": 0,
+        "win_rate": 0.0,
+        "avg_win_pnl": 0.0,
+        "avg_loss_pnl": 0.0,
+        "largest_win_pnl": 0.0,
+        "largest_loss_pnl": 0.0,
+        "expectancy_per_trade": 0.0,
+        "profit_factor": 0.0,
+        "total_pnl": 0.0
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 10000.0,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 114876.86872968526,
+        "oracle_final_equity_long_short": 1662923.281928573,
+        "capture_ratio_vs_long_only": 0.0,
+        "capture_ratio_vs_long_short": 0.0
+      }
+    },
+    {
+      "fold_index": 1,
+      "threshold": 0.7,
+      "n_fills": 0,
+      "total_return_pct": 0.0,
+      "sharpe": 0.0,
+      "sortino": 0.0,
+      "cost_adjusted_sharpe": 0.0,
+      "max_drawdown_pct": 0.0,
+      "hit_rate": 0.0,
+      "turnover": 0.0,
+      "trade_metrics": {
+        "n_trades": 0,
+        "n_wins": 0,
+        "n_losses": 0,
+        "win_rate": 0.0,
+        "avg_win_pnl": 0.0,
+        "avg_loss_pnl": 0.0,
+        "largest_win_pnl": 0.0,
+        "largest_loss_pnl": 0.0,
+        "expectancy_per_trade": 0.0,
+        "profit_factor": 0.0,
+        "total_pnl": 0.0
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 10000.0,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 114876.86872968526,
+        "oracle_final_equity_long_short": 1662923.281928573,
+        "capture_ratio_vs_long_only": 0.0,
+        "capture_ratio_vs_long_short": 0.0
+      }
+    },
+    {
+      "fold_index": 1,
+      "threshold": 0.75,
+      "n_fills": 0,
+      "total_return_pct": 0.0,
+      "sharpe": 0.0,
+      "sortino": 0.0,
+      "cost_adjusted_sharpe": 0.0,
+      "max_drawdown_pct": 0.0,
+      "hit_rate": 0.0,
+      "turnover": 0.0,
+      "trade_metrics": {
+        "n_trades": 0,
+        "n_wins": 0,
+        "n_losses": 0,
+        "win_rate": 0.0,
+        "avg_win_pnl": 0.0,
+        "avg_loss_pnl": 0.0,
+        "largest_win_pnl": 0.0,
+        "largest_loss_pnl": 0.0,
+        "expectancy_per_trade": 0.0,
+        "profit_factor": 0.0,
+        "total_pnl": 0.0
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 10000.0,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 114876.86872968526,
+        "oracle_final_equity_long_short": 1662923.281928573,
+        "capture_ratio_vs_long_only": 0.0,
+        "capture_ratio_vs_long_short": 0.0
+      }
+    },
+    {
+      "fold_index": 1,
+      "threshold": 0.8,
+      "n_fills": 0,
+      "total_return_pct": 0.0,
+      "sharpe": 0.0,
+      "sortino": 0.0,
+      "cost_adjusted_sharpe": 0.0,
+      "max_drawdown_pct": 0.0,
+      "hit_rate": 0.0,
+      "turnover": 0.0,
+      "trade_metrics": {
+        "n_trades": 0,
+        "n_wins": 0,
+        "n_losses": 0,
+        "win_rate": 0.0,
+        "avg_win_pnl": 0.0,
+        "avg_loss_pnl": 0.0,
+        "largest_win_pnl": 0.0,
+        "largest_loss_pnl": 0.0,
+        "expectancy_per_trade": 0.0,
+        "profit_factor": 0.0,
+        "total_pnl": 0.0
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 10000.0,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 114876.86872968526,
+        "oracle_final_equity_long_short": 1662923.281928573,
+        "capture_ratio_vs_long_only": 0.0,
+        "capture_ratio_vs_long_short": 0.0
+      }
+    },
+    {
+      "fold_index": 2,
+      "threshold": 0.55,
+      "n_fills": 47,
+      "total_return_pct": -2.3199021911829876,
+      "sharpe": -3.8083641652609144,
+      "sortino": -5.169312415111667,
+      "cost_adjusted_sharpe": -4.87742285262545,
+      "max_drawdown_pct": 2.5211574049350705,
+      "hit_rate": 0.3142857142857143,
+      "turnover": 11.92603697932295,
+      "trade_metrics": {
+        "n_trades": 18,
+        "n_wins": 4,
+        "n_losses": 14,
+        "win_rate": 0.2222222222222222,
+        "avg_win_pnl": 83.12877016990059,
+        "avg_loss_pnl": -34.452144212476064,
+        "largest_win_pnl": 185.2683471786473,
+        "largest_loss_pnl": -262.4534166345516,
+        "expectancy_per_trade": -8.323052127503477,
+        "profit_factor": 0.6893932942147402,
+        "total_pnl": -149.81493829506257
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 9768.0097808817,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 66990.99857726153,
+        "oracle_final_equity_long_short": 457044.86715054145,
+        "capture_ratio_vs_long_only": -0.004070646679471572,
+        "capture_ratio_vs_long_short": -0.0005189416905667692
+      }
+    },
+    {
+      "fold_index": 2,
+      "threshold": 0.6,
+      "n_fills": 34,
+      "total_return_pct": -0.5750996977735512,
+      "sharpe": -1.0893643678096805,
+      "sortino": -1.697926963412251,
+      "cost_adjusted_sharpe": -2.040798881407632,
+      "max_drawdown_pct": 1.7554285245274803,
+      "hit_rate": 0.4,
+      "turnover": 9.037339593811419,
+      "trade_metrics": {
+        "n_trades": 13,
+        "n_wins": 4,
+        "n_losses": 9,
+        "win_rate": 0.3076923076923077,
+        "avg_win_pnl": 88.06551526059171,
+        "avg_loss_pnl": -42.18724697854733,
+        "largest_win_pnl": 202.03456220218027,
+        "largest_loss_pnl": -262.5465689515355,
+        "expectancy_per_trade": -2.1094739818891624,
+        "profit_factor": 0.9277739555892486,
+        "total_pnl": -27.42316176455911
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 9942.490030222645,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 66990.99857726153,
+        "oracle_final_equity_long_short": 457044.86715054145,
+        "capture_ratio_vs_long_only": -0.0010091061959440844,
+        "capture_ratio_vs_long_short": -0.00012864473792960194
+      }
+    },
+    {
+      "fold_index": 2,
+      "threshold": 0.65,
+      "n_fills": 28,
+      "total_return_pct": -1.1002893184613227,
+      "sharpe": -2.3668332134688,
+      "sortino": -3.4479090746112795,
+      "cost_adjusted_sharpe": -3.3119574434192245,
+      "max_drawdown_pct": 1.755428524527436,
+      "hit_rate": 0.3,
+      "turnover": 7.988781767256078,
+      "trade_metrics": {
+        "n_trades": 11,
+        "n_wins": 2,
+        "n_losses": 9,
+        "win_rate": 0.18181818181818182,
+        "avg_win_pnl": 74.47360164053866,
+        "avg_loss_pnl": -42.77299195011607,
+        "largest_win_pnl": 80.1390655691404,
+        "largest_loss_pnl": -261.1597258916842,
+        "expectancy_per_trade": -21.455429479087936,
+        "profit_factor": 0.3869191398337082,
+        "total_pnl": -236.0097242699673
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 9889.971068153867,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 66990.99857726153,
+        "oracle_final_equity_long_short": 457044.86715054145,
+        "capture_ratio_vs_long_only": -0.001930637023265495,
+        "capture_ratio_vs_long_short": -0.000246125031134918
+      }
+    },
+    {
+      "fold_index": 2,
+      "threshold": 0.7,
+      "n_fills": 17,
+      "total_return_pct": -1.4556649292988166,
+      "sharpe": -4.577908136990892,
+      "sortino": -4.895713991062512,
+      "cost_adjusted_sharpe": -5.26142381091435,
+      "max_drawdown_pct": 1.4556649292988166,
+      "hit_rate": 0.23076923076923078,
+      "turnover": 3.9728929575191105,
+      "trade_metrics": {
+        "n_trades": 6,
+        "n_wins": 0,
+        "n_losses": 6,
+        "win_rate": 0.0,
+        "avg_win_pnl": 0.0,
+        "avg_loss_pnl": -45.65879461256514,
+        "largest_win_pnl": 0.0,
+        "largest_loss_pnl": -179.10027013880307,
+        "expectancy_per_trade": -45.65879461256514,
+        "profit_factor": 0.0,
+        "total_pnl": -273.9527676753908
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 9854.433507070118,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 66990.99857726153,
+        "oracle_final_equity_long_short": 457044.86715054145,
+        "capture_ratio_vs_long_only": -0.0025542014803011416,
+        "capture_ratio_vs_long_short": -0.00032561942575858374
+      }
+    },
+    {
+      "fold_index": 2,
+      "threshold": 0.75,
+      "n_fills": 15,
+      "total_return_pct": -1.3065798926787053,
+      "sharpe": -4.716584335293425,
+      "sortino": -4.875460400327926,
+      "cost_adjusted_sharpe": -5.697736041298488,
+      "max_drawdown_pct": 1.3065798926787053,
+      "hit_rate": 0.3,
+      "turnover": 4.966068761698791,
+      "trade_metrics": {
+        "n_trades": 7,
+        "n_wins": 0,
+        "n_losses": 7,
+        "win_rate": 0.0,
+        "avg_win_pnl": 0.0,
+        "avg_loss_pnl": -43.640214032238624,
+        "largest_win_pnl": 0.0,
+        "largest_loss_pnl": -179.37122605233333,
+        "expectancy_per_trade": -43.640214032238624,
+        "profit_factor": 0.0,
+        "total_pnl": -305.48149822567035
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 9869.342010732129,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 66990.99857726153,
+        "oracle_final_equity_long_short": 457044.86715054145,
+        "capture_ratio_vs_long_only": -0.002292607473630071,
+        "capture_ratio_vs_long_short": -0.00029227041594433905
+      }
+    },
+    {
+      "fold_index": 2,
+      "threshold": 0.8,
+      "n_fills": 13,
+      "total_return_pct": -1.3724818155576801,
+      "sharpe": -5.057621057123997,
+      "sortino": -5.141302301330497,
+      "cost_adjusted_sharpe": -5.858545349300578,
+      "max_drawdown_pct": 1.3724818155576801,
+      "hit_rate": 0.2222222222222222,
+      "turnover": 3.9730718923350192,
+      "trade_metrics": {
+        "n_trades": 6,
+        "n_wins": 0,
+        "n_losses": 6,
+        "win_rate": 0.0,
+        "avg_win_pnl": 0.0,
+        "avg_loss_pnl": -51.624127003481085,
+        "largest_win_pnl": 0.0,
+        "largest_loss_pnl": -236.75076456703383,
+        "expectancy_per_trade": -51.624127003481085,
+        "profit_factor": 0.0,
+        "total_pnl": -309.7447620208865
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 9862.751818444232,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 66990.99857726153,
+        "oracle_final_equity_long_short": 457044.86715054145,
+        "capture_ratio_vs_long_only": -0.002408243143339618,
+        "capture_ratio_vs_long_short": -0.0003070120957446313
+      }
+    },
+    {
+      "fold_index": 3,
+      "threshold": 0.55,
+      "n_fills": 78,
+      "total_return_pct": -2.7827038950892002,
+      "sharpe": -2.0896849020626638,
+      "sortino": -2.828294694976975,
+      "cost_adjusted_sharpe": -3.2434255380957877,
+      "max_drawdown_pct": 3.714603107451475,
+      "hit_rate": 0.36,
+      "turnover": 27.83364780455282,
+      "trade_metrics": {
+        "n_trades": 34,
+        "n_wins": 18,
+        "n_losses": 16,
+        "win_rate": 0.5294117647058824,
+        "avg_win_pnl": 47.614858311336626,
+        "avg_loss_pnl": -26.75497099116962,
+        "largest_win_pnl": 215.68386323888845,
+        "largest_loss_pnl": -88.57893387942154,
+        "expectancy_per_trade": 12.617291580745448,
+        "profit_factor": 2.0021219839084554,
+        "total_pnl": 428.9879137453452
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 9721.72961049108,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 187783.53070906104,
+        "oracle_final_equity_long_short": 4753209.20097532,
+        "capture_ratio_vs_long_only": -0.0015652202900858325,
+        "capture_ratio_vs_long_short": -5.8667112859306474e-05
+      }
+    },
+    {
+      "fold_index": 3,
+      "threshold": 0.6,
+      "n_fills": 13,
+      "total_return_pct": -0.4084257474582187,
+      "sharpe": -1.1653066184173273,
+      "sortino": -1.6546766589591777,
+      "cost_adjusted_sharpe": -1.9532884702520061,
+      "max_drawdown_pct": 0.5382729936700081,
+      "hit_rate": 0.375,
+      "turnover": 4.989871259328684,
+      "trade_metrics": {
+        "n_trades": 8,
+        "n_wins": 5,
+        "n_losses": 3,
+        "win_rate": 0.625,
+        "avg_win_pnl": 111.58517967853057,
+        "avg_loss_pnl": -84.64971191511428,
+        "largest_win_pnl": 481.4149176568798,
+        "largest_loss_pnl": -253.44111870523446,
+        "expectancy_per_trade": 37.99709533091374,
+        "profit_factor": 2.196998610588438,
+        "total_pnl": 303.9767626473099
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 9959.157425254178,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 187783.53070906104,
+        "oracle_final_equity_long_short": 4753209.20097532,
+        "capture_ratio_vs_long_only": -0.00022973204876136627,
+        "capture_ratio_vs_long_short": -8.610747073399932e-06
+      }
+    },
+    {
+      "fold_index": 3,
+      "threshold": 0.65,
+      "n_fills": 7,
+      "total_return_pct": -0.781338605178894,
+      "sharpe": -3.0783509234944018,
+      "sortino": -3.2338532394193664,
+      "cost_adjusted_sharpe": -3.509336672484352,
+      "max_drawdown_pct": 0.781338605178894,
+      "hit_rate": 0.2,
+      "turnover": 1.9921186056326874,
+      "trade_metrics": {
+        "n_trades": 3,
+        "n_wins": 2,
+        "n_losses": 1,
+        "win_rate": 0.6666666666666666,
+        "avg_win_pnl": 93.72732329241168,
+        "avg_loss_pnl": -0.03373173448236982,
+        "largest_win_pnl": 187.4317604955662,
+        "largest_loss_pnl": -0.03373173448236982,
+        "expectancy_per_trade": 62.473638283447,
+        "profit_factor": 5557.219320660732,
+        "total_pnl": 187.420914850341
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 9921.86613948211,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 187783.53070906104,
+        "oracle_final_equity_long_short": 4753209.20097532,
+        "capture_ratio_vs_long_only": -0.0004394887434525856,
+        "capture_ratio_vs_long_short": -1.647278397541967e-05
+      }
+    },
+    {
+      "fold_index": 3,
+      "threshold": 0.7,
+      "n_fills": 5,
+      "total_return_pct": -0.07174933548450557,
+      "sharpe": -0.6871797385536271,
+      "sortino": -0.8954325213480152,
+      "cost_adjusted_sharpe": -1.7446651066596885,
+      "max_drawdown_pct": 0.2262610876771154,
+      "hit_rate": 0.6666666666666666,
+      "turnover": 1.9997423508204553,
+      "trade_metrics": {
+        "n_trades": 3,
+        "n_wins": 3,
+        "n_losses": 0,
+        "win_rate": 1.0,
+        "avg_win_pnl": 62.7937911780031,
+        "avg_loss_pnl": 0.0,
+        "largest_win_pnl": 188.0024201755687,
+        "largest_loss_pnl": 0.0,
+        "expectancy_per_trade": 62.7937911780031,
+        "profit_factor": Infinity,
+        "total_pnl": 188.3813735340093
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 9992.825066451549,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 187783.53070906104,
+        "oracle_final_equity_long_short": 4753209.20097532,
+        "capture_ratio_vs_long_only": -4.035769522539286e-05,
+        "capture_ratio_vs_long_short": -1.512674909421076e-06
+      }
+    },
+    {
+      "fold_index": 3,
+      "threshold": 0.75,
+      "n_fills": 2,
+      "total_return_pct": 0.09232144936843767,
+      "sharpe": 1.4190318197267087,
+      "sortino": 4.161238605797151,
+      "cost_adjusted_sharpe": 0.5726818187119215,
+      "max_drawdown_pct": 0.0526172979188444,
+      "hit_rate": 1.0,
+      "turnover": 1.0019743003588817,
+      "trade_metrics": {
+        "n_trades": 1,
+        "n_wins": 1,
+        "n_losses": 0,
+        "win_rate": 1.0,
+        "avg_win_pnl": 9.232144936844435,
+        "avg_loss_pnl": 0.0,
+        "largest_win_pnl": 9.232144936844435,
+        "largest_loss_pnl": 0.0,
+        "expectancy_per_trade": 9.232144936844435,
+        "profit_factor": Infinity,
+        "total_pnl": 9.232144936844435
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 10009.232144936843,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 187783.53070906104,
+        "oracle_final_equity_long_short": 4753209.20097532,
+        "capture_ratio_vs_long_only": 5.192913483055962e-05,
+        "capture_ratio_vs_long_short": 1.946392104093872e-06
+      }
+    },
+    {
+      "fold_index": 3,
+      "threshold": 0.8,
+      "n_fills": 2,
+      "total_return_pct": 0.09232144936843767,
+      "sharpe": 1.4190318197267087,
+      "sortino": 4.161238605797151,
+      "cost_adjusted_sharpe": 0.5726818187119215,
+      "max_drawdown_pct": 0.0526172979188444,
+      "hit_rate": 1.0,
+      "turnover": 1.0019743003588817,
+      "trade_metrics": {
+        "n_trades": 1,
+        "n_wins": 1,
+        "n_losses": 0,
+        "win_rate": 1.0,
+        "avg_win_pnl": 9.232144936844435,
+        "avg_loss_pnl": 0.0,
+        "largest_win_pnl": 9.232144936844435,
+        "largest_loss_pnl": 0.0,
+        "expectancy_per_trade": 9.232144936844435,
+        "profit_factor": Infinity,
+        "total_pnl": 9.232144936844435
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 10009.232144936843,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 187783.53070906104,
+        "oracle_final_equity_long_short": 4753209.20097532,
+        "capture_ratio_vs_long_only": 5.192913483055962e-05,
+        "capture_ratio_vs_long_short": 1.946392104093872e-06
+      }
+    },
+    {
+      "fold_index": 4,
+      "threshold": 0.55,
+      "n_fills": 0,
+      "total_return_pct": 0.0,
+      "sharpe": 0.0,
+      "sortino": 0.0,
+      "cost_adjusted_sharpe": 0.0,
+      "max_drawdown_pct": 0.0,
+      "hit_rate": 0.0,
+      "turnover": 0.0,
+      "trade_metrics": {
+        "n_trades": 0,
+        "n_wins": 0,
+        "n_losses": 0,
+        "win_rate": 0.0,
+        "avg_win_pnl": 0.0,
+        "avg_loss_pnl": 0.0,
+        "largest_win_pnl": 0.0,
+        "largest_loss_pnl": 0.0,
+        "expectancy_per_trade": 0.0,
+        "profit_factor": 0.0,
+        "total_pnl": 0.0
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 10000.0,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 65973.99281389125,
+        "oracle_final_equity_long_short": 388675.6809772623,
+        "capture_ratio_vs_long_only": 0.0,
+        "capture_ratio_vs_long_short": 0.0
+      }
+    },
+    {
+      "fold_index": 4,
+      "threshold": 0.6,
+      "n_fills": 0,
+      "total_return_pct": 0.0,
+      "sharpe": 0.0,
+      "sortino": 0.0,
+      "cost_adjusted_sharpe": 0.0,
+      "max_drawdown_pct": 0.0,
+      "hit_rate": 0.0,
+      "turnover": 0.0,
+      "trade_metrics": {
+        "n_trades": 0,
+        "n_wins": 0,
+        "n_losses": 0,
+        "win_rate": 0.0,
+        "avg_win_pnl": 0.0,
+        "avg_loss_pnl": 0.0,
+        "largest_win_pnl": 0.0,
+        "largest_loss_pnl": 0.0,
+        "expectancy_per_trade": 0.0,
+        "profit_factor": 0.0,
+        "total_pnl": 0.0
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 10000.0,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 65973.99281389125,
+        "oracle_final_equity_long_short": 388675.6809772623,
+        "capture_ratio_vs_long_only": 0.0,
+        "capture_ratio_vs_long_short": 0.0
+      }
+    },
+    {
+      "fold_index": 4,
+      "threshold": 0.65,
+      "n_fills": 0,
+      "total_return_pct": 0.0,
+      "sharpe": 0.0,
+      "sortino": 0.0,
+      "cost_adjusted_sharpe": 0.0,
+      "max_drawdown_pct": 0.0,
+      "hit_rate": 0.0,
+      "turnover": 0.0,
+      "trade_metrics": {
+        "n_trades": 0,
+        "n_wins": 0,
+        "n_losses": 0,
+        "win_rate": 0.0,
+        "avg_win_pnl": 0.0,
+        "avg_loss_pnl": 0.0,
+        "largest_win_pnl": 0.0,
+        "largest_loss_pnl": 0.0,
+        "expectancy_per_trade": 0.0,
+        "profit_factor": 0.0,
+        "total_pnl": 0.0
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 10000.0,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 65973.99281389125,
+        "oracle_final_equity_long_short": 388675.6809772623,
+        "capture_ratio_vs_long_only": 0.0,
+        "capture_ratio_vs_long_short": 0.0
+      }
+    },
+    {
+      "fold_index": 4,
+      "threshold": 0.7,
+      "n_fills": 0,
+      "total_return_pct": 0.0,
+      "sharpe": 0.0,
+      "sortino": 0.0,
+      "cost_adjusted_sharpe": 0.0,
+      "max_drawdown_pct": 0.0,
+      "hit_rate": 0.0,
+      "turnover": 0.0,
+      "trade_metrics": {
+        "n_trades": 0,
+        "n_wins": 0,
+        "n_losses": 0,
+        "win_rate": 0.0,
+        "avg_win_pnl": 0.0,
+        "avg_loss_pnl": 0.0,
+        "largest_win_pnl": 0.0,
+        "largest_loss_pnl": 0.0,
+        "expectancy_per_trade": 0.0,
+        "profit_factor": 0.0,
+        "total_pnl": 0.0
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 10000.0,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 65973.99281389125,
+        "oracle_final_equity_long_short": 388675.6809772623,
+        "capture_ratio_vs_long_only": 0.0,
+        "capture_ratio_vs_long_short": 0.0
+      }
+    },
+    {
+      "fold_index": 4,
+      "threshold": 0.75,
+      "n_fills": 0,
+      "total_return_pct": 0.0,
+      "sharpe": 0.0,
+      "sortino": 0.0,
+      "cost_adjusted_sharpe": 0.0,
+      "max_drawdown_pct": 0.0,
+      "hit_rate": 0.0,
+      "turnover": 0.0,
+      "trade_metrics": {
+        "n_trades": 0,
+        "n_wins": 0,
+        "n_losses": 0,
+        "win_rate": 0.0,
+        "avg_win_pnl": 0.0,
+        "avg_loss_pnl": 0.0,
+        "largest_win_pnl": 0.0,
+        "largest_loss_pnl": 0.0,
+        "expectancy_per_trade": 0.0,
+        "profit_factor": 0.0,
+        "total_pnl": 0.0
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 10000.0,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 65973.99281389125,
+        "oracle_final_equity_long_short": 388675.6809772623,
+        "capture_ratio_vs_long_only": 0.0,
+        "capture_ratio_vs_long_short": 0.0
+      }
+    },
+    {
+      "fold_index": 4,
+      "threshold": 0.8,
+      "n_fills": 0,
+      "total_return_pct": 0.0,
+      "sharpe": 0.0,
+      "sortino": 0.0,
+      "cost_adjusted_sharpe": 0.0,
+      "max_drawdown_pct": 0.0,
+      "hit_rate": 0.0,
+      "turnover": 0.0,
+      "trade_metrics": {
+        "n_trades": 0,
+        "n_wins": 0,
+        "n_losses": 0,
+        "win_rate": 0.0,
+        "avg_win_pnl": 0.0,
+        "avg_loss_pnl": 0.0,
+        "largest_win_pnl": 0.0,
+        "largest_loss_pnl": 0.0,
+        "expectancy_per_trade": 0.0,
+        "profit_factor": 0.0,
+        "total_pnl": 0.0
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 10000.0,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 65973.99281389125,
+        "oracle_final_equity_long_short": 388675.6809772623,
+        "capture_ratio_vs_long_only": 0.0,
+        "capture_ratio_vs_long_short": 0.0
+      }
+    },
+    {
+      "fold_index": 5,
+      "threshold": 0.55,
+      "n_fills": 57,
+      "total_return_pct": -2.0954954587720342,
+      "sharpe": -2.9917136622446043,
+      "sortino": -4.212338826204017,
+      "cost_adjusted_sharpe": -4.703324587195544,
+      "max_drawdown_pct": 2.696537997074766,
+      "hit_rate": 0.2571428571428571,
+      "turnover": 21.884844955814287,
+      "trade_metrics": {
+        "n_trades": 32,
+        "n_wins": 10,
+        "n_losses": 22,
+        "win_rate": 0.3125,
+        "avg_win_pnl": 69.11856244964459,
+        "avg_loss_pnl": -22.621593430824884,
+        "largest_win_pnl": 372.68520689560535,
+        "largest_loss_pnl": -167.59743996258493,
+        "expectancy_per_trade": 6.0472052818218245,
+        "profit_factor": 1.3888291504431154,
+        "total_pnl": 193.51056901829838
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 9790.450454122796,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 85316.98590284685,
+        "oracle_final_equity_long_short": 829827.5776406971,
+        "capture_ratio_vs_long_only": -0.0027822348885217776,
+        "capture_ratio_vs_long_short": -0.00025560197240527804
+      }
+    },
+    {
+      "fold_index": 5,
+      "threshold": 0.6,
+      "n_fills": 46,
+      "total_return_pct": -2.346073704891549,
+      "sharpe": -4.085227371736644,
+      "sortino": -4.932086359091686,
+      "cost_adjusted_sharpe": -5.7788672631097135,
+      "max_drawdown_pct": 2.346073704891549,
+      "hit_rate": 0.25,
+      "turnover": 17.823796701035665,
+      "trade_metrics": {
+        "n_trades": 26,
+        "n_wins": 7,
+        "n_losses": 19,
+        "win_rate": 0.2692307692307692,
+        "avg_win_pnl": 60.932311666815494,
+        "avg_loss_pnl": -27.084599223834815,
+        "largest_win_pnl": 371.7313508300833,
+        "largest_loss_pnl": -151.6095158254138,
+        "expectancy_per_trade": -3.3877385994289635,
+        "profit_factor": 0.8288380499205763,
+        "total_pnl": -88.08120358515305
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 9765.392629510845,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 85316.98590284685,
+        "oracle_final_equity_long_short": 829827.5776406971,
+        "capture_ratio_vs_long_only": -0.0031149330748814147,
+        "capture_ratio_vs_long_short": -0.00028616672198843185
+      }
+    },
+    {
+      "fold_index": 5,
+      "threshold": 0.65,
+      "n_fills": 31,
+      "total_return_pct": -1.9442159844737072,
+      "sharpe": -3.7664329421527807,
+      "sortino": -4.389781959675997,
+      "cost_adjusted_sharpe": -4.923667183627191,
+      "max_drawdown_pct": 1.9442159844737072,
+      "hit_rate": 0.2,
+      "turnover": 10.925645237008903,
+      "trade_metrics": {
+        "n_trades": 19,
+        "n_wins": 4,
+        "n_losses": 15,
+        "win_rate": 0.21052631578947367,
+        "avg_win_pnl": 100.86454361664616,
+        "avg_loss_pnl": -18.110016030956388,
+        "largest_win_pnl": 373.26107030906275,
+        "largest_loss_pnl": -64.7989473777025,
+        "expectancy_per_trade": 6.937259684328359,
+        "profit_factor": 1.4852119172688112,
+        "total_pnl": 131.80793400223882
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 9805.57840155263,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 85316.98590284685,
+        "oracle_final_equity_long_short": 829827.5776406971,
+        "capture_ratio_vs_long_only": -0.002581377840825437,
+        "capture_ratio_vs_long_short": -0.00023714937597839526
+      }
+    },
+    {
+      "fold_index": 5,
+      "threshold": 0.7,
+      "n_fills": 21,
+      "total_return_pct": -1.6780389280950492,
+      "sharpe": -3.411759998337505,
+      "sortino": -3.8910918663793073,
+      "cost_adjusted_sharpe": -4.188571177628881,
+      "max_drawdown_pct": 1.6780389280950492,
+      "hit_rate": 0.21428571428571427,
+      "turnover": 6.977172517222341,
+      "trade_metrics": {
+        "n_trades": 11,
+        "n_wins": 3,
+        "n_losses": 8,
+        "win_rate": 0.2727272727272727,
+        "avg_win_pnl": 126.21919773299255,
+        "avg_loss_pnl": -27.10685537068237,
+        "largest_win_pnl": 348.4532663074923,
+        "largest_loss_pnl": -115.38474024708913,
+        "expectancy_per_trade": 14.709340930319883,
+        "profit_factor": 1.7461339023878335,
+        "total_pnl": 161.8027502335187
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 9832.196107190495,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 85316.98590284685,
+        "oracle_final_equity_long_short": 829827.5776406971,
+        "capture_ratio_vs_long_only": -0.002227968774878473,
+        "capture_ratio_vs_long_short": -0.000204681932379503
+      }
+    },
+    {
+      "fold_index": 5,
+      "threshold": 0.75,
+      "n_fills": 5,
+      "total_return_pct": -0.5957956766248551,
+      "sharpe": -2.853799053445932,
+      "sortino": -3.0204815647401344,
+      "cost_adjusted_sharpe": -3.382225997986911,
+      "max_drawdown_pct": 0.7570072437351971,
+      "hit_rate": 0.0,
+      "turnover": 2.0077026543333445,
+      "trade_metrics": {
+        "n_trades": 2,
+        "n_wins": 0,
+        "n_losses": 2,
+        "win_rate": 0.0,
+        "avg_win_pnl": 0.0,
+        "avg_loss_pnl": -29.789783831243486,
+        "largest_win_pnl": 0.0,
+        "largest_loss_pnl": -38.858534466747,
+        "expectancy_per_trade": -29.789783831243486,
+        "profit_factor": 0.0,
+        "total_pnl": -59.57956766248697
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 9940.420432337514,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 85316.98590284685,
+        "oracle_final_equity_long_short": 829827.5776406971,
+        "capture_ratio_vs_long_only": -0.0007910508758188835,
+        "capture_ratio_vs_long_short": -7.267329044229497e-05
+      }
+    },
+    {
+      "fold_index": 5,
+      "threshold": 0.8,
+      "n_fills": 0,
+      "total_return_pct": 0.0,
+      "sharpe": 0.0,
+      "sortino": 0.0,
+      "cost_adjusted_sharpe": 0.0,
+      "max_drawdown_pct": 0.0,
+      "hit_rate": 0.0,
+      "turnover": 0.0,
+      "trade_metrics": {
+        "n_trades": 0,
+        "n_wins": 0,
+        "n_losses": 0,
+        "win_rate": 0.0,
+        "avg_win_pnl": 0.0,
+        "avg_loss_pnl": 0.0,
+        "largest_win_pnl": 0.0,
+        "largest_loss_pnl": 0.0,
+        "expectancy_per_trade": 0.0,
+        "profit_factor": 0.0,
+        "total_pnl": 0.0
+      },
+      "oracle_capture": {
+        "strategy_final_equity": 10000.0,
+        "initial_equity": 10000.0,
+        "oracle_final_equity_long_only": 85316.98590284685,
+        "oracle_final_equity_long_short": 829827.5776406971,
+        "capture_ratio_vs_long_only": 0.0,
+        "capture_ratio_vs_long_short": 0.0
+      }
+    }
+  ],
+  "per_threshold": [
+    {
+      "threshold": 0.55,
+      "robustness": {
+        "n_folds": 6,
+        "n_folds_with_trades": 3,
+        "pct_folds_positive_cas": 0.0,
+        "mean_cost_adjusted_sharpe": -2.1373621629861304,
+        "median_cost_adjusted_sharpe": -1.6217127690478939,
+        "min_cost_adjusted_sharpe": -4.87742285262545,
+        "std_cost_adjusted_sharpe": 2.409166784696094,
+        "max_fold_drawdown_pct": 3.714603107451475,
+        "mean_hit_rate": 0.31047619047619046,
+        "total_fills": 182,
+        "mean_turnover_per_fold": 10.274088289948343,
+        "annualized_turnover": 62.50070376385242,
+        "consistency_score": -2.409166784696094
+      },
+      "gate": {
+        "passed": false,
+        "reasons_failed": [
+          "pct_folds_positive_cas=0.00 < 0.50",
+          "annualized_turnover=62.50 > 50.00"
+        ]
+      }
+    },
+    {
+      "threshold": 0.6,
+      "robustness": {
+        "n_folds": 6,
+        "n_folds_with_trades": 3,
+        "pct_folds_positive_cas": 0.0,
+        "mean_cost_adjusted_sharpe": -1.6288257691282253,
+        "median_cost_adjusted_sharpe": -0.9766442351260031,
+        "min_cost_adjusted_sharpe": -5.7788672631097135,
+        "std_cost_adjusted_sharpe": 2.2564158504122545,
+        "max_fold_drawdown_pct": 2.346073704891549,
+        "mean_hit_rate": 0.3416666666666666,
+        "total_fills": 93,
+        "mean_turnover_per_fold": 5.308501259029295,
+        "annualized_turnover": 32.293382659094874,
+        "consistency_score": -2.2564158504122545
+      },
+      "gate": {
+        "passed": false,
+        "reasons_failed": [
+          "pct_folds_positive_cas=0.00 < 0.50"
+        ]
+      }
+    },
+    {
+      "threshold": 0.65,
+      "robustness": {
+        "n_folds": 6,
+        "n_folds_with_trades": 3,
+        "pct_folds_positive_cas": 0.0,
+        "mean_cost_adjusted_sharpe": -1.9574935499217947,
+        "median_cost_adjusted_sharpe": -1.6559787217096122,
+        "min_cost_adjusted_sharpe": -4.923667183627191,
+        "std_cost_adjusted_sharpe": 2.215234458700852,
+        "max_fold_drawdown_pct": 1.9442159844737072,
+        "mean_hit_rate": 0.2333333333333333,
+        "total_fills": 66,
+        "mean_turnover_per_fold": 3.484424268316278,
+        "annualized_turnover": 21.19691429892402,
+        "consistency_score": -2.215234458700852
+      },
+      "gate": {
+        "passed": false,
+        "reasons_failed": [
+          "pct_folds_positive_cas=0.00 < 0.50"
+        ]
+      }
+    },
+    {
+      "threshold": 0.7,
+      "robustness": {
+        "n_folds": 6,
+        "n_folds_with_trades": 3,
+        "pct_folds_positive_cas": 0.0,
+        "mean_cost_adjusted_sharpe": -1.86577668253382,
+        "median_cost_adjusted_sharpe": -0.8723325533298443,
+        "min_cost_adjusted_sharpe": -5.26142381091435,
+        "std_cost_adjusted_sharpe": 2.340249114431807,
+        "max_fold_drawdown_pct": 1.6780389280950492,
+        "mean_hit_rate": 0.3705738705738706,
+        "total_fills": 43,
+        "mean_turnover_per_fold": 2.1583013042603176,
+        "annualized_turnover": 13.129666267583598,
+        "consistency_score": -2.340249114431807
+      },
+      "gate": {
+        "passed": false,
+        "reasons_failed": [
+          "pct_folds_positive_cas=0.00 < 0.50"
+        ]
+      }
+    },
+    {
+      "threshold": 0.75,
+      "robustness": {
+        "n_folds": 6,
+        "n_folds_with_trades": 3,
+        "pct_folds_positive_cas": 0.16666666666666666,
+        "mean_cost_adjusted_sharpe": -1.4178800367622462,
+        "median_cost_adjusted_sharpe": 0.0,
+        "min_cost_adjusted_sharpe": -5.697736041298488,
+        "std_cost_adjusted_sharpe": 2.5365058790138875,
+        "max_fold_drawdown_pct": 1.3065798926787053,
+        "mean_hit_rate": 0.43333333333333335,
+        "total_fills": 22,
+        "mean_turnover_per_fold": 1.3292909527318362,
+        "annualized_turnover": 8.086519962452003,
+        "consistency_score": -2.772819218474262
+      },
+      "gate": {
+        "passed": false,
+        "reasons_failed": [
+          "pct_folds_positive_cas=0.17 < 0.50"
+        ]
+      }
+    },
+    {
+      "threshold": 0.8,
+      "robustness": {
+        "n_folds": 6,
+        "n_folds_with_trades": 2,
+        "pct_folds_positive_cas": 0.16666666666666666,
+        "mean_cost_adjusted_sharpe": -0.8809772550981094,
+        "median_cost_adjusted_sharpe": 0.0,
+        "min_cost_adjusted_sharpe": -5.858545349300578,
+        "std_cost_adjusted_sharpe": 2.4492363108239856,
+        "max_fold_drawdown_pct": 1.3724818155576801,
+        "mean_hit_rate": 0.6111111111111112,
+        "total_fills": 15,
+        "mean_turnover_per_fold": 0.8291743654489835,
+        "annualized_turnover": 5.044144056481316,
+        "consistency_score": -2.5960658533403373
+      },
+      "gate": {
+        "passed": false,
+        "reasons_failed": [
+          "pct_folds_positive_cas=0.17 < 0.50",
+          "n_folds_with_trades=2 < 3"
+        ]
+      }
+    }
+  ],
+  "recommended_threshold": null,
+  "recommendation_notes": "NO threshold passed the robustness gates; least-broken was 0.65 (cons=-2.215, gate reasons: pct_folds_positive_cas=0.00 < 0.50)"
+}
