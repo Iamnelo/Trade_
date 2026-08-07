@@ -1,0 +1,169 @@
+{
+  "spec": {
+    "name": "baseline_eth_5f_hourly_v1",
+    "data": {
+      "csv_path": "ETHUSDT_60_2y.csv",
+      "symbol": "ETHUSDT",
+      "interval": "60"
+    },
+    "features": [
+      "log_return@5",
+      "realized_vol@20",
+      "atr@14",
+      "macd_hist@12_26_9",
+      "rsi_close@14"
+    ],
+    "label": {
+      "kind": "triple_barrier",
+      "horizon_bars": 6,
+      "up_pct": 0.01,
+      "down_pct": 0.01
+    },
+    "model": {
+      "n_estimators": 100,
+      "learning_rate": 0.05,
+      "num_leaves": 15,
+      "min_data_in_leaf": 5,
+      "max_depth": -1,
+      "calibration_fraction": 0.2
+    },
+    "strategy": {
+      "confidence_threshold": 0.55,
+      "notional_fraction": 0.5,
+      "allow_short": true
+    },
+    "wfo": {
+      "train_bars": 8640,
+      "test_bars": 1440,
+      "step_bars": 1440,
+      "expanding": false
+    },
+    "backtest": {
+      "initial_equity": 10000.0,
+      "fee_bps": 5.5,
+      "slippage_bps": 5.0,
+      "bars_per_year": 8760
+    },
+    "gates": {
+      "max_fold_drawdown_pct": 15.0,
+      "min_pct_folds_positive_cas": 0.5,
+      "min_fills_per_fold": 0,
+      "min_folds_with_trades": 3,
+      "max_annualized_turnover": 50.0
+    }
+  },
+  "spec_fingerprint": "d9d1e6ed035202ec4aa34dec184154ea9dbb457ec8d250b091fe8f2e8b9c80a8",
+  "generated_at": "2026-08-07T10:46:53.847932+00:00",
+  "code_git_sha": "f85c4632656c151cbeb704462c8f0bc65095bac2",
+  "lockfile_sha": "79ade2ae10d21347267b0d616484519e4be44635d460a1eba18aa271cb3b10b2",
+  "n_bars": 17520,
+  "folds": [
+    {
+      "train_start": 0,
+      "train_end": 8640,
+      "test_start": 8640,
+      "test_end": 10080,
+      "reproducibility_hash": "2cbe05a022495aa7ce3b974fceefa3ff243b0729952ca975b75d4ba20c32f696",
+      "n_fills": 96,
+      "total_return_pct": -3.864231521996575,
+      "sharpe": -4.538402068550029,
+      "cost_adjusted_sharpe": -6.793235803622283,
+      "max_drawdown_pct": 3.864231521996575,
+      "hit_rate": 0.4666666666666667,
+      "turnover": 35.40547212408417
+    },
+    {
+      "train_start": 1440,
+      "train_end": 10080,
+      "test_start": 10080,
+      "test_end": 11520,
+      "reproducibility_hash": "2cbe05a022495aa7ce3b974fceefa3ff243b0729952ca975b75d4ba20c32f696",
+      "n_fills": 67,
+      "total_return_pct": -4.665690503979314,
+      "sharpe": -3.9958604397269792,
+      "cost_adjusted_sharpe": -5.330535463321183,
+      "max_drawdown_pct": 5.325865663788876,
+      "hit_rate": 0.42105263157894735,
+      "turnover": 28.771506666801137
+    },
+    {
+      "train_start": 2880,
+      "train_end": 11520,
+      "test_start": 11520,
+      "test_end": 12960,
+      "reproducibility_hash": "2cbe05a022495aa7ce3b974fceefa3ff243b0729952ca975b75d4ba20c32f696",
+      "n_fills": 62,
+      "total_return_pct": -3.1678709969827246,
+      "sharpe": -6.1009210734464805,
+      "cost_adjusted_sharpe": -8.769819662061881,
+      "max_drawdown_pct": 3.1678709969827246,
+      "hit_rate": 0.4166666666666667,
+      "turnover": 25.540734747315398
+    },
+    {
+      "train_start": 4320,
+      "train_end": 12960,
+      "test_start": 12960,
+      "test_end": 14400,
+      "reproducibility_hash": "2cbe05a022495aa7ce3b974fceefa3ff243b0729952ca975b75d4ba20c32f696",
+      "n_fills": 15,
+      "total_return_pct": -1.6753823998637563,
+      "sharpe": -2.340342979327607,
+      "cost_adjusted_sharpe": -2.646724506141699,
+      "max_drawdown_pct": 1.9407904166378498,
+      "hit_rate": 0.5454545454545454,
+      "turnover": 3.9863370408224146
+    },
+    {
+      "train_start": 5760,
+      "train_end": 14400,
+      "test_start": 14400,
+      "test_end": 15840,
+      "reproducibility_hash": "2cbe05a022495aa7ce3b974fceefa3ff243b0729952ca975b75d4ba20c32f696",
+      "n_fills": 71,
+      "total_return_pct": -2.5266271107784233,
+      "sharpe": -3.241870333542264,
+      "cost_adjusted_sharpe": -4.9734978463399075,
+      "max_drawdown_pct": 2.5266271107784233,
+      "hit_rate": 0.391304347826087,
+      "turnover": 24.681679289440844
+    },
+    {
+      "train_start": 7200,
+      "train_end": 15840,
+      "test_start": 15840,
+      "test_end": 17280,
+      "reproducibility_hash": "2cbe05a022495aa7ce3b974fceefa3ff243b0729952ca975b75d4ba20c32f696",
+      "n_fills": 8,
+      "total_return_pct": -0.5290899464281629,
+      "sharpe": -3.398666918191698,
+      "cost_adjusted_sharpe": -4.804624664083359,
+      "max_drawdown_pct": 0.5290899464281629,
+      "hit_rate": 0.25,
+      "turnover": 3.9848278982343217
+    }
+  ],
+  "robustness": {
+    "n_folds": 6,
+    "n_folds_with_trades": 6,
+    "pct_folds_positive_cas": 0.0,
+    "mean_cost_adjusted_sharpe": -5.553072990928385,
+    "median_cost_adjusted_sharpe": -5.152016654830545,
+    "min_cost_adjusted_sharpe": -8.769819662061881,
+    "std_cost_adjusted_sharpe": 2.0629071554791083,
+    "max_fold_drawdown_pct": 5.325865663788876,
+    "mean_hit_rate": 0.41519080969881883,
+    "total_fills": 319,
+    "mean_turnover_per_fold": 20.39509296111638,
+    "annualized_turnover": 124.0701488467913,
+    "consistency_score": -2.0629071554791083
+  },
+  "gate": {
+    "passed": false,
+    "reasons_failed": [
+      "pct_folds_positive_cas=0.00 < 0.50",
+      "annualized_turnover=124.07 > 50.00"
+    ]
+  },
+  "error": null
+}
