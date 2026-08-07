@@ -102,16 +102,19 @@ def summarize_fold(fold: ModelFoldResult) -> dict[str, object]:
         "test_start_idx": fold.split.test_start,
         "test_end_idx": fold.split.test_end,
         "reproducibility_hash": fold.reproducibility_hash,
-        "n_fills": len(fold.backtest.fills),
-        "final_equity": fold.backtest.final_equity,
-        "total_return": r.total_return,
-        "annualized_return": r.annualized_return,
+        "n_fills": r.n_fills,
+        "final_equity": r.final_equity,
+        "total_return_pct": r.total_return_pct,
         "sharpe": r.sharpe,
         "cost_adjusted_sharpe": r.cost_adjusted_sharpe,
         "sortino": r.sortino,
-        "max_drawdown": r.max_drawdown,
+        "calmar": r.calmar,
+        "max_drawdown_pct": r.max_drawdown_pct,
+        "ulcer_index_pct": r.ulcer_index_pct,
         "hit_rate": r.hit_rate,
-        "n_trades": r.n_trades,
+        "turnover": r.turnover,
+        "cvar_5pct": r.cvar_5pct,
+        "halted_reasons_seen": list(r.halted_reasons_seen),
     }
 
 
@@ -170,9 +173,10 @@ def run_for_symbol(
         print(f"[{symbol}] fold {i}: "
               f"sharpe={f['sharpe']:.2f} "
               f"cas={f['cost_adjusted_sharpe']:.2f} "
-              f"mdd={f['max_drawdown']:.2%} "
+              f"mdd={f['max_drawdown_pct']:.2f}% "
               f"hit={f['hit_rate']:.2%} "
-              f"n_trades={f['n_trades']}")
+              f"n_fills={f['n_fills']} "
+              f"ret={f['total_return_pct']:.2f}%")
     print(f"[{symbol}] mean cost-adjusted sharpe = {mean_cas:.3f}")
     return {
         "symbol": symbol,
