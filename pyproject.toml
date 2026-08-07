@@ -24,6 +24,7 @@ dependencies = [
     "lightgbm>=4.5",
     "scikit-learn>=1.5",
     "numpy>=1.26",
+    "plotly>=5.20",
 ]
 
 [project.optional-dependencies]
@@ -112,6 +113,12 @@ ignore_missing_imports = true
 # to the concrete types they were saved from.
 [[tool.mypy.overrides]]
 module = ["joblib"]
+ignore_missing_imports = true
+
+# plotly's typing ships but is very loose; strict mypy trips on figure
+# construction helpers. Wrapping surface is confined to the report writer.
+[[tool.mypy.overrides]]
+module = ["plotly", "plotly.*"]
 ignore_missing_imports = true
 
 # ---------------------------------------------------------------------------

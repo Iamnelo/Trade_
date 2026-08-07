@@ -12,6 +12,14 @@ from trade.research.ablation import AblationSpec, format_ablation_table, run_abl
 from trade.research.experiment import ExperimentSpec
 from trade.research.leaderboard import format_table, load_results_dir
 from trade.research.runner import run_experiment
+from trade.research.sweep import run_threshold_sweep
+from trade.research.sweep_reports import (
+    write_cell_csv,
+    write_classifier_csv,
+    write_html_report,
+    write_markdown_summary,
+    write_threshold_csv,
+)
 
 research_app = typer.Typer(no_args_is_help=True)
 
@@ -119,3 +127,80 @@ def ablation(
     typer.echo("")
     typer.echo(format_ablation_table(report))
     typer.echo(f"\nwrote {out_path}")
+
+
+@research_app.command("sweep")
+def sweep(
+    spec_path: Path = typer.Option(..., help="Base ExperimentSpec JSON to sweep."),
+    thresholds: str = typer.Option(
+        "0.55,0.60,0.65,0.70,0.75,0.80",
+        help="Comma-separated confidence thresholds to evaluate.",
+    ),
+    out_dir: Path = typer.Option(
+        Path("eval_reports/sweeps"),
+        help="Directory to write CSVs + markdown + HTML into.",
+    ),
+    data_root: Path = typer.Option(
+        Path.cwd(), help="Root against which spec.data.csv_path resolves."
+    ),
+    lockfile: Path | None = typer.Option(
+        None, help="Path to a Python lockfile; sha256 feeds the reproducibility hash."
+    ),
+) -> None:
+    """Sweep confidence thresholds against a base spec.
+
+    Trains each fold ONCE, replays the strategy at every threshold, then
+    emits CSV (per-cell, per-threshold, per-fold classifier), a markdown
+    summary, and an interactive plotly HTML.
+    """
+    base_spec = ExperimentSpec.from_json(spec_path.read_text())
+    thr_list = tuple(float(x) for x in thresholds.split(",") if x.strip())
+    typer.echo(
+        f"sweep base={base_spec.name}  thresholds={thr_list}  "
+        f"fingerprint={base_spec.fingerprint[:12]}"
+    )
+
+    git_sha = current_git_sha()
+    lock_sha = lockfile_sha(lockfile) if lockfile else "no-lockfile-supplied"
+    if lockfile is None:
+        typer.echo(
+            "WARNING: no --lockfile supplied; reproducibility hash uses a placeholder.",
+            err=True,
+        )
+
+    result = run_threshold_sweep(
+        base_spec,
+        thresholds=thr_list,
+        code_git_sha=git_sha,
+        lockfile_sha=lock_sha,
+        data_root=data_root,
+    )
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    stem = f"{base_spec.name}_sweep"
+    (out_dir / f"{stem}.json").write_text(json.dumps(result.to_dict(), indent=2, default=str))
+    write_cell_csv(result, out_dir / f"{stem}__cells.csv")
+    write_threshold_csv(result, out_dir / f"{stem}__thresholds.csv")
+    write_classifier_csv(result, out_dir / f"{stem}__classifier.csv")
+    write_markdown_summary(result, out_dir / f"{stem}.md")
+    write_html_report(result, out_dir / f"{stem}.html")
+
+    typer.echo("")
+    typer.echo(f"recommendation: {result.recommendation_notes}")
+    typer.echo("")
+    typer.echo("per-threshold aggregate:")
+    for t in result.per_threshold:
+        star = " ⭐" if result.recommended_threshold == t.threshold else ""
+        typer.echo(
+            f"  θ={t.threshold:.2f}{star}  "
+            f"mean_cas={t.robustness.mean_cost_adjusted_sharpe:>7.3f}  "
+            f"pct_pos={t.robustness.pct_folds_positive_cas:>4.2f}  "
+            f"max_dd={t.robustness.max_fold_drawdown_pct:>5.2f}%  "
+            f"ann_tv={t.robustness.annualized_turnover:>6.2f}  "
+            f"cons={t.robustness.consistency_score:>7.3f}  "
+            f"{'PASS' if t.gate.passed else 'FAIL'}"
+        )
+    typer.echo(
+        f"\nwrote {out_dir}/{stem}.* (json, cells.csv, thresholds.csv, "
+        f"classifier.csv, md, html)"
+    )

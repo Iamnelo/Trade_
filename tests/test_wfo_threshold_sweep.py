@@ -93,12 +93,8 @@ def test_threshold_sweep_matches_single_run_at_same_threshold() -> None:
     splits = walk_forward_splits(n_bars=800, train_bars=400, test_bars=100, step_bars=100)
 
     kwargs = _common_kwargs()
-    single = run_walk_forward_model(
-        bars=bars, splits=splits, confidence_threshold=0.55, **kwargs
-    )
-    sweep = run_walk_forward_threshold_sweep(
-        bars=bars, splits=splits, thresholds=[0.55], **kwargs
-    )
+    single = run_walk_forward_model(bars=bars, splits=splits, confidence_threshold=0.55, **kwargs)
+    sweep = run_walk_forward_threshold_sweep(bars=bars, splits=splits, thresholds=[0.55], **kwargs)
     assert len(single.folds) == len(sweep.folds)
     for s_fold, sw_fold in zip(single.folds, sweep.folds, strict=True):
         sw_result = sw_fold.per_threshold[0].result
