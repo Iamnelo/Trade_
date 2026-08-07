@@ -177,6 +177,7 @@ def run_experiment(
         model_config=spec.model.to_lightgbm_config(),
         confidence_threshold=spec.strategy.confidence_threshold,
         notional_fraction=spec.strategy.notional_fraction,
+        label_mode=spec.label.mode,
         allow_short=spec.strategy.allow_short,
         calibration_fraction=spec.model.calibration_fraction,
         cost_bps_per_side=spec.backtest.fee_bps,

@@ -223,6 +223,7 @@ def run_threshold_sweep(
         allow_short=base_spec.strategy.allow_short,
         calibration_fraction=base_spec.model.calibration_fraction,
         cost_bps_per_side=base_spec.backtest.fee_bps,
+        label_mode=base_spec.label.mode,
     )
 
     per_fold_clf: list[FoldClassifierDiagnostics] = []
@@ -240,6 +241,7 @@ def run_threshold_sweep(
             label_horizon_bars=base_spec.label.horizon_bars,
             label_up_pct=base_spec.label.up_pct,
             label_down_pct=base_spec.label.down_pct,
+            label_mode=base_spec.label.mode,
         )
         per_fold_clf.append(
             FoldClassifierDiagnostics(

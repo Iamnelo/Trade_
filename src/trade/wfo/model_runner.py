@@ -33,14 +33,23 @@ from typing import Any
 from trade.data.schemas import KlineRecord
 from trade.features.protocol import Feature
 from trade.features.store import InMemoryFeatureStore
-from trade.labels.triple_barrier import triple_barrier_labels
+from trade.labels.triple_barrier import (
+    triple_barrier_labels,
+    triple_barrier_labels_directional,
+)
 from trade.metrics.performance import PerformanceReport, summarize
 from trade.mre.backtest import run_backtest
 from trade.mre.clock import SimClock
 from trade.mre.source import MarketReplaySource
 from trade.mre.types import BacktestConfig, BacktestResult
+from trade.strategies.binary_model_driven import BinaryModelDrivenStrategy
 from trade.strategies.model_driven import ModelDrivenStrategy
-from trade.training.pipeline import TrainingArtifacts, train_model
+from trade.training.pipeline import (
+    BinaryTrainingArtifacts,
+    TrainingArtifacts,
+    train_model,
+    train_model_binary,
+)
 from trade.wfo.splitter import Split
 
 
@@ -70,10 +79,12 @@ class ModelWFOReport:
 @dataclass(frozen=True, slots=True)
 class TrainedFold:
     """Everything the threshold-sweep runner needs to re-run the strategy
-    at multiple confidence thresholds without retraining."""
+    at multiple confidence thresholds without retraining. The `artifacts`
+    field is either a 3-class or a 2-class-directional bundle — the
+    replay layer dispatches on the concrete type."""
 
     split: Split
-    artifacts: TrainingArtifacts
+    artifacts: TrainingArtifacts | BinaryTrainingArtifacts
     features: tuple[Feature, ...]
     sorted_bars: tuple[KlineRecord, ...]
     symbol: str
@@ -98,12 +109,23 @@ def _train_fold(
     python_lockfile_sha: str,
     model_config: dict[str, Any] | None,
     calibration_fraction: float,
+    label_mode: str = "3class",
 ) -> TrainedFold | None:
     """Materialise features, generate train-slice labels, and fit the model.
 
+    `label_mode`:
+      - "3class" fits the multiclass LightGBMClassifierV1 on every training
+        row (down/flat/up).
+      - "2class_directional" drops flat rows and fits a binary
+        LightGBMBinaryClassifierV1 on the survivors (down vs up only).
+
     Returns None when the fold produces no usable labels (train slice too
-    short after horizon trim) or no test bars — the caller should skip.
+    short after horizon trim, or 2-class drop leaves too few rows) or no
+    test bars — the caller should skip.
     """
+    if label_mode not in {"3class", "2class_directional"}:
+        raise ValueError(f"unknown label_mode {label_mode!r}")
+
     max_lookback = max(f.spec.lookback_bars for f in features)
 
     store = InMemoryFeatureStore()
@@ -111,12 +133,20 @@ def _train_fold(
         store.materialize(feature=feat, entity_id=symbol, bars=sorted_bars)
 
     train_bars = sorted_bars[split.train_start : split.train_end]
-    labels = triple_barrier_labels(
-        train_bars,
-        horizon_bars=label_horizon_bars,
-        up_pct=label_up_pct,
-        down_pct=label_down_pct,
-    )
+    if label_mode == "3class":
+        labels = triple_barrier_labels(
+            train_bars,
+            horizon_bars=label_horizon_bars,
+            up_pct=label_up_pct,
+            down_pct=label_down_pct,
+        )
+    else:
+        labels = triple_barrier_labels_directional(
+            train_bars,
+            horizon_bars=label_horizon_bars,
+            up_pct=label_up_pct,
+            down_pct=label_down_pct,
+        )
     labels = labels[: max(0, len(labels) - label_horizon_bars)]
     if not labels:
         return None
@@ -125,17 +155,31 @@ def _train_fold(
     if not sorted_bars[warmup_start : split.test_end]:
         return None
 
-    artifacts = train_model(
-        feature_store=store,
-        feature_ids=[f.spec.full_id for f in features],
-        labels=labels,
-        dataset_manifest_ids=dataset_manifest_ids,
-        feature_manifest_ids=feature_manifest_ids,
-        code_git_sha=code_git_sha,
-        python_lockfile_sha=python_lockfile_sha,
-        model_config=model_config,
-        calibration_fraction=calibration_fraction,
-    )
+    artifacts: TrainingArtifacts | BinaryTrainingArtifacts
+    if label_mode == "3class":
+        artifacts = train_model(
+            feature_store=store,
+            feature_ids=[f.spec.full_id for f in features],
+            labels=labels,
+            dataset_manifest_ids=dataset_manifest_ids,
+            feature_manifest_ids=feature_manifest_ids,
+            code_git_sha=code_git_sha,
+            python_lockfile_sha=python_lockfile_sha,
+            model_config=model_config,
+            calibration_fraction=calibration_fraction,
+        )
+    else:
+        artifacts = train_model_binary(
+            feature_store=store,
+            feature_ids=[f.spec.full_id for f in features],
+            labels=labels,
+            dataset_manifest_ids=dataset_manifest_ids,
+            feature_manifest_ids=feature_manifest_ids,
+            code_git_sha=code_git_sha,
+            python_lockfile_sha=python_lockfile_sha,
+            model_config=model_config,
+            calibration_fraction=calibration_fraction,
+        )
     return TrainedFold(
         split=split,
         artifacts=artifacts,
@@ -169,16 +213,29 @@ def _backtest_fold(
         clock=SimClock(source_bars[0].event_time),
         interval=trained.interval,
     )
-    strategy = ModelDrivenStrategy(
-        symbol=trained.symbol,
-        interval=trained.interval,
-        model=trained.artifacts.model,
-        features=list(trained.features),
-        calibrator=trained.artifacts.calibrator,
-        confidence_threshold=confidence_threshold,
-        notional_fraction=notional_fraction,
-        allow_short=allow_short,
-    )
+    strategy: ModelDrivenStrategy | BinaryModelDrivenStrategy
+    if isinstance(trained.artifacts, BinaryTrainingArtifacts):
+        strategy = BinaryModelDrivenStrategy(
+            symbol=trained.symbol,
+            interval=trained.interval,
+            model=trained.artifacts.model,
+            features=list(trained.features),
+            calibrator=trained.artifacts.calibrator,
+            confidence_threshold=confidence_threshold,
+            notional_fraction=notional_fraction,
+            allow_short=allow_short,
+        )
+    else:
+        strategy = ModelDrivenStrategy(
+            symbol=trained.symbol,
+            interval=trained.interval,
+            model=trained.artifacts.model,
+            features=list(trained.features),
+            calibrator=trained.artifacts.calibrator,
+            confidence_threshold=confidence_threshold,
+            notional_fraction=notional_fraction,
+            allow_short=allow_short,
+        )
     result = run_backtest(source=source, strategy=strategy, config=config)
     report = summarize(
         equity_curve=result.equity_curve,
@@ -219,6 +276,7 @@ def run_walk_forward_model(
     allow_short: bool = True,
     calibration_fraction: float = 0.2,
     cost_bps_per_side: float = 5.5,
+    label_mode: str = "3class",
 ) -> ModelWFOReport:
     sorted_bars = sorted(bars, key=lambda b: b.event_time)
     fold_results: list[ModelFoldResult] = []
@@ -239,6 +297,7 @@ def run_walk_forward_model(
             python_lockfile_sha=python_lockfile_sha,
             model_config=model_config,
             calibration_fraction=calibration_fraction,
+            label_mode=label_mode,
         )
         if trained is None:
             continue
@@ -298,6 +357,7 @@ def run_walk_forward_threshold_sweep(
     allow_short: bool = True,
     calibration_fraction: float = 0.2,
     cost_bps_per_side: float = 5.5,
+    label_mode: str = "3class",
 ) -> ThresholdSweepReport:
     """Train each fold ONCE and replay the strategy at every threshold.
 
@@ -331,6 +391,7 @@ def run_walk_forward_threshold_sweep(
             python_lockfile_sha=python_lockfile_sha,
             model_config=model_config,
             calibration_fraction=calibration_fraction,
+            label_mode=label_mode,
         )
         if trained is None:
             continue

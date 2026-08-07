@@ -134,3 +134,98 @@ class LightGBMClassifierV1:
                 f"unexpected pred_contrib shape {arr.shape}; expected (1, {expected_cols})"
             )
         return arr.reshape(n_classes, n_feats + 1)
+
+
+# ---------------------------------------------------------------------------
+# 2-class directional classifier
+# ---------------------------------------------------------------------------
+
+_BINARY_DEFAULT_PARAMS: dict[str, Any] = {
+    "objective": "binary",
+    "learning_rate": 0.05,
+    "num_leaves": 15,
+    "min_data_in_leaf": 5,
+    "n_estimators": 100,
+    "verbose": -1,
+    "random_state": 42,
+    "deterministic": True,
+    "force_row_wise": True,
+}
+
+_BINARY_CLASS_NAMES = ("down", "up")
+
+
+def _binary_label_to_int(label: float) -> int:
+    if label == -1.0:
+        return 0
+    if label == 1.0:
+        return 1
+    raise ValueError(f"unexpected binary label value {label!r}; expected -1 or +1")
+
+
+def binary_training_frame_to_xy(
+    frame: TrainingFrame,
+    feature_ids: Sequence[str],
+) -> tuple[np.ndarray, np.ndarray]:
+    n = frame.n_rows
+    m = len(feature_ids)
+    x = np.full((n, m), np.nan, dtype=np.float64)
+    for j, fid in enumerate(feature_ids):
+        column = frame.features.get(fid, ())
+        for i, v in enumerate(column):
+            if v is not None:
+                x[i, j] = v
+    y = np.array([_binary_label_to_int(v) for v in frame.labels], dtype=np.int64)
+    return x, y
+
+
+class LightGBMBinaryClassifierV1:
+    """Directional {-1, +1} classifier.
+
+    Same feature-frame contract as `LightGBMClassifierV1` but with two
+    classes only: down=0, up=1. `predict_proba_matrix` returns a
+    (n_rows, 2) array with the same column order as `_BINARY_CLASS_NAMES`
+    so downstream code can uniformly index probs[:, 0] = P(down),
+    probs[:, 1] = P(up) whether the model is binary or ternary.
+    """
+
+    def __init__(self, *, params: Mapping[str, Any] | None = None) -> None:
+        self._params: dict[str, Any] = dict(_BINARY_DEFAULT_PARAMS)
+        if params:
+            self._params.update(params)
+        self._model: LGBMClassifier | None = None
+        self._feature_ids: tuple[str, ...] = ()
+
+    @property
+    def feature_ids(self) -> tuple[str, ...]:
+        return self._feature_ids
+
+    @property
+    def params(self) -> dict[str, Any]:
+        return dict(self._params)
+
+    def fit(self, *, frame: TrainingFrame, feature_ids: Sequence[str]) -> None:
+        x, y = binary_training_frame_to_xy(frame, feature_ids)
+        if x.shape[0] == 0:
+            raise ValueError("training frame is empty; cannot fit")
+        model = LGBMClassifier(**self._params)
+        model.fit(x, y)
+        self._model = model
+        self._feature_ids = tuple(feature_ids)
+
+    def predict_proba_matrix(self, frame: TrainingFrame) -> np.ndarray:
+        if self._model is None:
+            raise RuntimeError("model has not been fit")
+        x, _ = binary_training_frame_to_xy(frame, self._feature_ids)
+        probs = self._model.predict_proba(x)
+        return np.asarray(probs, dtype=np.float64)
+
+    def predict_proba_single(self, feature_vector: Mapping[str, float]) -> dict[str, float]:
+        if self._model is None:
+            raise RuntimeError("model has not been fit")
+        x = np.array(
+            [[feature_vector.get(fid, float("nan")) for fid in self._feature_ids]],
+            dtype=np.float64,
+        )
+        row = np.asarray(self._model.predict_proba(x), dtype=np.float64)[0]
+        return {name: float(row[i]) for i, name in enumerate(_BINARY_CLASS_NAMES)}

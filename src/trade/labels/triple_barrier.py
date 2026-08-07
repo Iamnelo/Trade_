@@ -72,6 +72,26 @@ def triple_barrier_labels(
     return labels
 
 
+def triple_barrier_labels_directional(
+    bars: Sequence[KlineRecord],
+    *,
+    horizon_bars: int,
+    up_pct: float,
+    down_pct: float,
+) -> list[LabelRow]:
+    """Same triple-barrier logic but drops timeout (flat) rows.
+
+    Only bars whose forward window unambiguously hit the up OR down barrier
+    are kept. This is the training-set shape used by the 2-class
+    directional classifier: down = -1, up = +1, no "flat" majority class
+    burning probability mass. Flat outcomes are still meaningful information
+    at test time — but we don't ask a directional model to predict them.
+    """
+    return [lb for lb in triple_barrier_labels(
+        bars, horizon_bars=horizon_bars, up_pct=up_pct, down_pct=down_pct,
+    ) if lb.label != 0.0]
+
+
 def vol_scaled_barriers(*, atr: float, entry_price: float, k: float = 1.5) -> tuple[float, float]:
     """Convenience: symmetric barriers at `k * ATR / price` in relative terms.
 

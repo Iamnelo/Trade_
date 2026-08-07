@@ -33,6 +33,10 @@ class LabelSpec:
     horizon_bars: int = 6
     up_pct: float = 0.01
     down_pct: float = 0.01
+    # "3class" = down/flat/up multiclass model (default, historical behavior).
+    # "2class_directional" = drop flat rows from training and fit a binary
+    # down-vs-up classifier + BinaryModelDrivenStrategy at inference.
+    mode: str = "3class"
 
     def __post_init__(self) -> None:
         if self.kind != "triple_barrier":
@@ -41,6 +45,10 @@ class LabelSpec:
             raise ValueError("horizon_bars must be >= 1")
         if self.up_pct <= 0 or self.down_pct <= 0:
             raise ValueError("up_pct and down_pct must be > 0")
+        if self.mode not in {"3class", "2class_directional"}:
+            raise ValueError(
+                f"label mode must be '3class' or '2class_directional'; got {self.mode!r}"
+            )
 
 
 @dataclass(frozen=True, slots=True)
