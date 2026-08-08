@@ -1,0 +1,2609 @@
+{
+  "name": "label_model_matrix_eth_daily_10pct",
+  "generated_at": "2026-08-08T07:16:52.005682+00:00",
+  "n_cells": 12,
+  "rows": [
+    {
+      "cell_index": 0,
+      "name": "baseline_eth_daily_v1__mode=3class__horizon_bars=5__features=n5",
+      "fingerprint": "1aeffa5553fc103c66651802a279feaf2c4e1d6a3a8a252d83bc22863e98c2b5",
+      "passed": false,
+      "mean_cost_adjusted_sharpe": -0.2968822529666989,
+      "consistency_score": -0.37068096760305597,
+      "pct_folds_positive_cas": 0.0,
+      "max_fold_drawdown_pct": 3.431116281484159,
+      "annualized_turnover": 5.135679118877605,
+      "total_fills": 24,
+      "reasons_failed": [
+        "pct_folds_positive_cas=0.00 < 0.50",
+        "n_folds_with_trades=2 < 3"
+      ],
+      "spec": {
+        "name": "baseline_eth_daily_v1__mode=3class__horizon_bars=5__features=n5",
+        "data": {
+          "csv_path": "ETHUSDT_D_5y.csv",
+          "symbol": "ETHUSDT",
+          "interval": "D"
+        },
+        "features": [
+          "log_return@5",
+          "realized_vol@20",
+          "atr@14",
+          "macd_hist@12_26_9",
+          "rsi_close@14"
+        ],
+        "label": {
+          "kind": "triple_barrier",
+          "horizon_bars": 5,
+          "up_pct": 0.1,
+          "down_pct": 0.1,
+          "mode": "3class"
+        },
+        "model": {
+          "n_estimators": 100,
+          "learning_rate": 0.05,
+          "num_leaves": 15,
+          "min_data_in_leaf": 5,
+          "max_depth": -1,
+          "calibration_fraction": 0.2
+        },
+        "strategy": {
+          "confidence_threshold": 0.55,
+          "notional_fraction": 0.5,
+          "allow_short": true
+        },
+        "wfo": {
+          "train_bars": 1095,
+          "test_bars": 180,
+          "step_bars": 180,
+          "expanding": false
+        },
+        "backtest": {
+          "initial_equity": 10000.0,
+          "fee_bps": 5.5,
+          "slippage_bps": 5.0,
+          "bars_per_year": 365
+        },
+        "gates": {
+          "max_fold_drawdown_pct": 15.0,
+          "min_pct_folds_positive_cas": 0.5,
+          "min_fills_per_fold": 0,
+          "min_folds_with_trades": 3,
+          "max_annualized_turnover": 50.0
+        }
+      },
+      "result": {
+        "spec": {
+          "name": "baseline_eth_daily_v1__mode=3class__horizon_bars=5__features=n5",
+          "data": {
+            "csv_path": "ETHUSDT_D_5y.csv",
+            "symbol": "ETHUSDT",
+            "interval": "D"
+          },
+          "features": [
+            "log_return@5",
+            "realized_vol@20",
+            "atr@14",
+            "macd_hist@12_26_9",
+            "rsi_close@14"
+          ],
+          "label": {
+            "kind": "triple_barrier",
+            "horizon_bars": 5,
+            "up_pct": 0.1,
+            "down_pct": 0.1,
+            "mode": "3class"
+          },
+          "model": {
+            "n_estimators": 100,
+            "learning_rate": 0.05,
+            "num_leaves": 15,
+            "min_data_in_leaf": 5,
+            "max_depth": -1,
+            "calibration_fraction": 0.2
+          },
+          "strategy": {
+            "confidence_threshold": 0.55,
+            "notional_fraction": 0.5,
+            "allow_short": true
+          },
+          "wfo": {
+            "train_bars": 1095,
+            "test_bars": 180,
+            "step_bars": 180,
+            "expanding": false
+          },
+          "backtest": {
+            "initial_equity": 10000.0,
+            "fee_bps": 5.5,
+            "slippage_bps": 5.0,
+            "bars_per_year": 365
+          },
+          "gates": {
+            "max_fold_drawdown_pct": 15.0,
+            "min_pct_folds_positive_cas": 0.5,
+            "min_fills_per_fold": 0,
+            "min_folds_with_trades": 3,
+            "max_annualized_turnover": 50.0
+          }
+        },
+        "spec_fingerprint": "1aeffa5553fc103c66651802a279feaf2c4e1d6a3a8a252d83bc22863e98c2b5",
+        "generated_at": "2026-08-08T04:23:15.491008+00:00",
+        "code_git_sha": "6e3f50b2e66e372c98036dfe3cf04e6a8e77e998",
+        "lockfile_sha": "9750eaffca2c952090be8a24a3176cb3b3eaf8da2eb4e50c54d29f43d130b436",
+        "n_bars": 1826,
+        "folds": [
+          {
+            "train_start": 0,
+            "train_end": 1095,
+            "test_start": 1095,
+            "test_end": 1275,
+            "reproducibility_hash": "5546de687fd83372d2ccfe79d8079a43ec62af6125355d66953bc3bae1fc88ff",
+            "n_fills": 0,
+            "total_return_pct": 0.0,
+            "sharpe": 0.0,
+            "cost_adjusted_sharpe": 0.0,
+            "max_drawdown_pct": 0.0,
+            "hit_rate": 0.0,
+            "turnover": 0.0
+          },
+          {
+            "train_start": 180,
+            "train_end": 1275,
+            "test_start": 1275,
+            "test_end": 1455,
+            "reproducibility_hash": "5546de687fd83372d2ccfe79d8079a43ec62af6125355d66953bc3bae1fc88ff",
+            "n_fills": 14,
+            "total_return_pct": -1.3162485612751351,
+            "sharpe": -0.6089680281604607,
+            "cost_adjusted_sharpe": -0.7664735831746962,
+            "max_drawdown_pct": 3.431116281484159,
+            "hit_rate": 0.375,
+            "turnover": 6.08526322534726
+          },
+          {
+            "train_start": 360,
+            "train_end": 1455,
+            "test_start": 1455,
+            "test_end": 1635,
+            "reproducibility_hash": "5546de687fd83372d2ccfe79d8079a43ec62af6125355d66953bc3bae1fc88ff",
+            "n_fills": 10,
+            "total_return_pct": -1.3730514734512367,
+            "sharpe": -0.3592971418169127,
+            "cost_adjusted_sharpe": -0.4210554286920994,
+            "max_drawdown_pct": 2.9544171900478977,
+            "hit_rate": 0.3333333333333333,
+            "turnover": 4.045391474904454
+          },
+          {
+            "train_start": 540,
+            "train_end": 1635,
+            "test_start": 1635,
+            "test_end": 1815,
+            "reproducibility_hash": "5546de687fd83372d2ccfe79d8079a43ec62af6125355d66953bc3bae1fc88ff",
+            "n_fills": 0,
+            "total_return_pct": 0.0,
+            "sharpe": 0.0,
+            "cost_adjusted_sharpe": 0.0,
+            "max_drawdown_pct": 0.0,
+            "hit_rate": 0.0,
+            "turnover": 0.0
+          }
+        ],
+        "robustness": {
+          "n_folds": 4,
+          "n_folds_with_trades": 2,
+          "pct_folds_positive_cas": 0.0,
+          "mean_cost_adjusted_sharpe": -0.2968822529666989,
+          "median_cost_adjusted_sharpe": -0.2105277143460497,
+          "min_cost_adjusted_sharpe": -0.7664735831746962,
+          "std_cost_adjusted_sharpe": 0.37068096760305597,
+          "max_fold_drawdown_pct": 3.431116281484159,
+          "mean_hit_rate": 0.35416666666666663,
+          "total_fills": 24,
+          "mean_turnover_per_fold": 2.5326636750629286,
+          "annualized_turnover": 5.135679118877605,
+          "consistency_score": -0.37068096760305597
+        },
+        "gate": {
+          "passed": false,
+          "reasons_failed": [
+            "pct_folds_positive_cas=0.00 < 0.50",
+            "n_folds_with_trades=2 < 3"
+          ]
+        },
+        "error": null
+      }
+    },
+    {
+      "cell_index": 1,
+      "name": "baseline_eth_daily_v1__mode=3class__horizon_bars=5__features=n12",
+      "fingerprint": "ff57eed07e80f6261d4bd7cfa590355fe2bace078dbf145e820d8d179d66d37f",
+      "passed": false,
+      "mean_cost_adjusted_sharpe": -0.23510800907029386,
+      "consistency_score": -0.4702160181405877,
+      "pct_folds_positive_cas": 0.0,
+      "max_fold_drawdown_pct": 5.554705323142173,
+      "annualized_turnover": 2.9110957704879747,
+      "total_fills": 13,
+      "reasons_failed": [
+        "pct_folds_positive_cas=0.00 < 0.50",
+        "n_folds_with_trades=1 < 3"
+      ],
+      "spec": {
+        "name": "baseline_eth_daily_v1__mode=3class__horizon_bars=5__features=n12",
+        "data": {
+          "csv_path": "ETHUSDT_D_5y.csv",
+          "symbol": "ETHUSDT",
+          "interval": "D"
+        },
+        "features": [
+          "log_return@5",
+          "realized_vol@20",
+          "atr@14",
+          "macd_hist@12_26_9",
+          "rsi_close@14",
+          "time_of_day@sin",
+          "time_of_day@cos",
+          "day_of_week@sin",
+          "day_of_week@cos",
+          "return_skew@20",
+          "return_kurtosis@20",
+          "vol_regime@20_120"
+        ],
+        "label": {
+          "kind": "triple_barrier",
+          "horizon_bars": 5,
+          "up_pct": 0.1,
+          "down_pct": 0.1,
+          "mode": "3class"
+        },
+        "model": {
+          "n_estimators": 100,
+          "learning_rate": 0.05,
+          "num_leaves": 15,
+          "min_data_in_leaf": 5,
+          "max_depth": -1,
+          "calibration_fraction": 0.2
+        },
+        "strategy": {
+          "confidence_threshold": 0.55,
+          "notional_fraction": 0.5,
+          "allow_short": true
+        },
+        "wfo": {
+          "train_bars": 1095,
+          "test_bars": 180,
+          "step_bars": 180,
+          "expanding": false
+        },
+        "backtest": {
+          "initial_equity": 10000.0,
+          "fee_bps": 5.5,
+          "slippage_bps": 5.0,
+          "bars_per_year": 365
+        },
+        "gates": {
+          "max_fold_drawdown_pct": 15.0,
+          "min_pct_folds_positive_cas": 0.5,
+          "min_fills_per_fold": 0,
+          "min_folds_with_trades": 3,
+          "max_annualized_turnover": 50.0
+        }
+      },
+      "result": {
+        "spec": {
+          "name": "baseline_eth_daily_v1__mode=3class__horizon_bars=5__features=n12",
+          "data": {
+            "csv_path": "ETHUSDT_D_5y.csv",
+            "symbol": "ETHUSDT",
+            "interval": "D"
+          },
+          "features": [
+            "log_return@5",
+            "realized_vol@20",
+            "atr@14",
+            "macd_hist@12_26_9",
+            "rsi_close@14",
+            "time_of_day@sin",
+            "time_of_day@cos",
+            "day_of_week@sin",
+            "day_of_week@cos",
+            "return_skew@20",
+            "return_kurtosis@20",
+            "vol_regime@20_120"
+          ],
+          "label": {
+            "kind": "triple_barrier",
+            "horizon_bars": 5,
+            "up_pct": 0.1,
+            "down_pct": 0.1,
+            "mode": "3class"
+          },
+          "model": {
+            "n_estimators": 100,
+            "learning_rate": 0.05,
+            "num_leaves": 15,
+            "min_data_in_leaf": 5,
+            "max_depth": -1,
+            "calibration_fraction": 0.2
+          },
+          "strategy": {
+            "confidence_threshold": 0.55,
+            "notional_fraction": 0.5,
+            "allow_short": true
+          },
+          "wfo": {
+            "train_bars": 1095,
+            "test_bars": 180,
+            "step_bars": 180,
+            "expanding": false
+          },
+          "backtest": {
+            "initial_equity": 10000.0,
+            "fee_bps": 5.5,
+            "slippage_bps": 5.0,
+            "bars_per_year": 365
+          },
+          "gates": {
+            "max_fold_drawdown_pct": 15.0,
+            "min_pct_folds_positive_cas": 0.5,
+            "min_fills_per_fold": 0,
+            "min_folds_with_trades": 3,
+            "max_annualized_turnover": 50.0
+          }
+        },
+        "spec_fingerprint": "ff57eed07e80f6261d4bd7cfa590355fe2bace078dbf145e820d8d179d66d37f",
+        "generated_at": "2026-08-08T04:42:33.951463+00:00",
+        "code_git_sha": "6e3f50b2e66e372c98036dfe3cf04e6a8e77e998",
+        "lockfile_sha": "9750eaffca2c952090be8a24a3176cb3b3eaf8da2eb4e50c54d29f43d130b436",
+        "n_bars": 1826,
+        "folds": [
+          {
+            "train_start": 0,
+            "train_end": 1095,
+            "test_start": 1095,
+            "test_end": 1275,
+            "reproducibility_hash": "bd934564146baa367e425a1f63f61b9e83a0661bbad60c607a35d32aa01e7f45",
+            "n_fills": 0,
+            "total_return_pct": 0.0,
+            "sharpe": 0.0,
+            "cost_adjusted_sharpe": 0.0,
+            "max_drawdown_pct": 0.0,
+            "hit_rate": 0.0,
+            "turnover": 0.0
+          },
+          {
+            "train_start": 180,
+            "train_end": 1275,
+            "test_start": 1275,
+            "test_end": 1455,
+            "reproducibility_hash": "bd934564146baa367e425a1f63f61b9e83a0661bbad60c607a35d32aa01e7f45",
+            "n_fills": 13,
+            "total_return_pct": -4.783955831976505,
+            "sharpe": -0.8814742414775775,
+            "cost_adjusted_sharpe": -0.9404320362811754,
+            "max_drawdown_pct": 5.554705323142173,
+            "hit_rate": 0.5714285714285714,
+            "turnover": 5.74243549246943
+          },
+          {
+            "train_start": 360,
+            "train_end": 1455,
+            "test_start": 1455,
+            "test_end": 1635,
+            "reproducibility_hash": "bd934564146baa367e425a1f63f61b9e83a0661bbad60c607a35d32aa01e7f45",
+            "n_fills": 0,
+            "total_return_pct": 0.0,
+            "sharpe": 0.0,
+            "cost_adjusted_sharpe": 0.0,
+            "max_drawdown_pct": 0.0,
+            "hit_rate": 0.0,
+            "turnover": 0.0
+          },
+          {
+            "train_start": 540,
+            "train_end": 1635,
+            "test_start": 1635,
+            "test_end": 1815,
+            "reproducibility_hash": "bd934564146baa367e425a1f63f61b9e83a0661bbad60c607a35d32aa01e7f45",
+            "n_fills": 0,
+            "total_return_pct": 0.0,
+            "sharpe": 0.0,
+            "cost_adjusted_sharpe": 0.0,
+            "max_drawdown_pct": 0.0,
+            "hit_rate": 0.0,
+            "turnover": 0.0
+          }
+        ],
+        "robustness": {
+          "n_folds": 4,
+          "n_folds_with_trades": 1,
+          "pct_folds_positive_cas": 0.0,
+          "mean_cost_adjusted_sharpe": -0.23510800907029386,
+          "median_cost_adjusted_sharpe": 0.0,
+          "min_cost_adjusted_sharpe": -0.9404320362811754,
+          "std_cost_adjusted_sharpe": 0.4702160181405877,
+          "max_fold_drawdown_pct": 5.554705323142173,
+          "mean_hit_rate": 0.5714285714285714,
+          "total_fills": 13,
+          "mean_turnover_per_fold": 1.4356088731173575,
+          "annualized_turnover": 2.9110957704879747,
+          "consistency_score": -0.4702160181405877
+        },
+        "gate": {
+          "passed": false,
+          "reasons_failed": [
+            "pct_folds_positive_cas=0.00 < 0.50",
+            "n_folds_with_trades=1 < 3"
+          ]
+        },
+        "error": null
+      }
+    },
+    {
+      "cell_index": 2,
+      "name": "baseline_eth_daily_v1__mode=3class__horizon_bars=10__features=n5",
+      "fingerprint": "ac01cc1069d105dd84f224879b5736a9bbafa63972e11a6da449d64a9d09b739",
+      "passed": true,
+      "mean_cost_adjusted_sharpe": -0.6053974579119039,
+      "consistency_score": -1.6979914948057755,
+      "pct_folds_positive_cas": 0.5,
+      "max_fold_drawdown_pct": 14.426751464724152,
+      "annualized_turnover": 12.310722323600498,
+      "total_fills": 64,
+      "reasons_failed": [],
+      "spec": {
+        "name": "baseline_eth_daily_v1__mode=3class__horizon_bars=10__features=n5",
+        "data": {
+          "csv_path": "ETHUSDT_D_5y.csv",
+          "symbol": "ETHUSDT",
+          "interval": "D"
+        },
+        "features": [
+          "log_return@5",
+          "realized_vol@20",
+          "atr@14",
+          "macd_hist@12_26_9",
+          "rsi_close@14"
+        ],
+        "label": {
+          "kind": "triple_barrier",
+          "horizon_bars": 10,
+          "up_pct": 0.1,
+          "down_pct": 0.1,
+          "mode": "3class"
+        },
+        "model": {
+          "n_estimators": 100,
+          "learning_rate": 0.05,
+          "num_leaves": 15,
+          "min_data_in_leaf": 5,
+          "max_depth": -1,
+          "calibration_fraction": 0.2
+        },
+        "strategy": {
+          "confidence_threshold": 0.55,
+          "notional_fraction": 0.5,
+          "allow_short": true
+        },
+        "wfo": {
+          "train_bars": 1095,
+          "test_bars": 180,
+          "step_bars": 180,
+          "expanding": false
+        },
+        "backtest": {
+          "initial_equity": 10000.0,
+          "fee_bps": 5.5,
+          "slippage_bps": 5.0,
+          "bars_per_year": 365
+        },
+        "gates": {
+          "max_fold_drawdown_pct": 15.0,
+          "min_pct_folds_positive_cas": 0.5,
+          "min_fills_per_fold": 0,
+          "min_folds_with_trades": 3,
+          "max_annualized_turnover": 50.0
+        }
+      },
+      "result": {
+        "spec": {
+          "name": "baseline_eth_daily_v1__mode=3class__horizon_bars=10__features=n5",
+          "data": {
+            "csv_path": "ETHUSDT_D_5y.csv",
+            "symbol": "ETHUSDT",
+            "interval": "D"
+          },
+          "features": [
+            "log_return@5",
+            "realized_vol@20",
+            "atr@14",
+            "macd_hist@12_26_9",
+            "rsi_close@14"
+          ],
+          "label": {
+            "kind": "triple_barrier",
+            "horizon_bars": 10,
+            "up_pct": 0.1,
+            "down_pct": 0.1,
+            "mode": "3class"
+          },
+          "model": {
+            "n_estimators": 100,
+            "learning_rate": 0.05,
+            "num_leaves": 15,
+            "min_data_in_leaf": 5,
+            "max_depth": -1,
+            "calibration_fraction": 0.2
+          },
+          "strategy": {
+            "confidence_threshold": 0.55,
+            "notional_fraction": 0.5,
+            "allow_short": true
+          },
+          "wfo": {
+            "train_bars": 1095,
+            "test_bars": 180,
+            "step_bars": 180,
+            "expanding": false
+          },
+          "backtest": {
+            "initial_equity": 10000.0,
+            "fee_bps": 5.5,
+            "slippage_bps": 5.0,
+            "bars_per_year": 365
+          },
+          "gates": {
+            "max_fold_drawdown_pct": 15.0,
+            "min_pct_folds_positive_cas": 0.5,
+            "min_fills_per_fold": 0,
+            "min_folds_with_trades": 3,
+            "max_annualized_turnover": 50.0
+          }
+        },
+        "spec_fingerprint": "ac01cc1069d105dd84f224879b5736a9bbafa63972e11a6da449d64a9d09b739",
+        "generated_at": "2026-08-08T05:02:38.359824+00:00",
+        "code_git_sha": "6e3f50b2e66e372c98036dfe3cf04e6a8e77e998",
+        "lockfile_sha": "9750eaffca2c952090be8a24a3176cb3b3eaf8da2eb4e50c54d29f43d130b436",
+        "n_bars": 1826,
+        "folds": [
+          {
+            "train_start": 0,
+            "train_end": 1095,
+            "test_start": 1095,
+            "test_end": 1275,
+            "reproducibility_hash": "5546de687fd83372d2ccfe79d8079a43ec62af6125355d66953bc3bae1fc88ff",
+            "n_fills": 8,
+            "total_return_pct": 0.88565599337318,
+            "sharpe": 0.23446758464572684,
+            "cost_adjusted_sharpe": 0.18351766722866295,
+            "max_drawdown_pct": 2.7689314621710537,
+            "hit_rate": 0.5,
+            "turnover": 3.9748392354846858
+          },
+          {
+            "train_start": 180,
+            "train_end": 1275,
+            "test_start": 1275,
+            "test_end": 1455,
+            "reproducibility_hash": "5546de687fd83372d2ccfe79d8079a43ec62af6125355d66953bc3bae1fc88ff",
+            "n_fills": 17,
+            "total_return_pct": -7.4747440243082774,
+            "sharpe": -2.2169035063128195,
+            "cost_adjusted_sharpe": -2.3243234148452254,
+            "max_drawdown_pct": 7.4747440243082774,
+            "hit_rate": 0.1,
+            "turnover": 6.7697937961989005
+          },
+          {
+            "train_start": 360,
+            "train_end": 1455,
+            "test_start": 1455,
+            "test_end": 1635,
+            "reproducibility_hash": "5546de687fd83372d2ccfe79d8079a43ec62af6125355d66953bc3bae1fc88ff",
+            "n_fills": 16,
+            "total_return_pct": 3.474773527710995,
+            "sharpe": 0.9199775096459294,
+            "cost_adjusted_sharpe": 0.8164183136918975,
+            "max_drawdown_pct": 3.0314879106463355,
+            "hit_rate": 0.5555555555555556,
+            "turnover": 7.193992088142816
+          },
+          {
+            "train_start": 540,
+            "train_end": 1635,
+            "test_start": 1635,
+            "test_end": 1815,
+            "reproducibility_hash": "5546de687fd83372d2ccfe79d8079a43ec62af6125355d66953bc3bae1fc88ff",
+            "n_fills": 23,
+            "total_return_pct": -11.887530610514075,
+            "sharpe": -1.0656832375918062,
+            "cost_adjusted_sharpe": -1.0972023977229506,
+            "max_drawdown_pct": 14.426751464724152,
+            "hit_rate": 0.375,
+            "turnover": 6.345539463714305
+          }
+        ],
+        "robustness": {
+          "n_folds": 4,
+          "n_folds_with_trades": 4,
+          "pct_folds_positive_cas": 0.5,
+          "mean_cost_adjusted_sharpe": -0.6053974579119039,
+          "median_cost_adjusted_sharpe": -0.45684236524714383,
+          "min_cost_adjusted_sharpe": -2.3243234148452254,
+          "std_cost_adjusted_sharpe": 1.3952927658498235,
+          "max_fold_drawdown_pct": 14.426751464724152,
+          "mean_hit_rate": 0.3826388888888889,
+          "total_fills": 64,
+          "mean_turnover_per_fold": 6.071041145885177,
+          "annualized_turnover": 12.310722323600498,
+          "consistency_score": -1.6979914948057755
+        },
+        "gate": {
+          "passed": true,
+          "reasons_failed": []
+        },
+        "error": null
+      }
+    },
+    {
+      "cell_index": 3,
+      "name": "baseline_eth_daily_v1__mode=3class__horizon_bars=10__features=n12",
+      "fingerprint": "6ced45110a54bb38a4c242d14fd3aecacd21e5c45a0f69cb0caac93f3f32ad16",
+      "passed": true,
+      "mean_cost_adjusted_sharpe": 0.2580739651479303,
+      "consistency_score": -0.7178810433759132,
+      "pct_folds_positive_cas": 0.5,
+      "max_fold_drawdown_pct": 13.341696258737901,
+      "annualized_turnover": 10.84639960872661,
+      "total_fills": 58,
+      "reasons_failed": [],
+      "spec": {
+        "name": "baseline_eth_daily_v1__mode=3class__horizon_bars=10__features=n12",
+        "data": {
+          "csv_path": "ETHUSDT_D_5y.csv",
+          "symbol": "ETHUSDT",
+          "interval": "D"
+        },
+        "features": [
+          "log_return@5",
+          "realized_vol@20",
+          "atr@14",
+          "macd_hist@12_26_9",
+          "rsi_close@14",
+          "time_of_day@sin",
+          "time_of_day@cos",
+          "day_of_week@sin",
+          "day_of_week@cos",
+          "return_skew@20",
+          "return_kurtosis@20",
+          "vol_regime@20_120"
+        ],
+        "label": {
+          "kind": "triple_barrier",
+          "horizon_bars": 10,
+          "up_pct": 0.1,
+          "down_pct": 0.1,
+          "mode": "3class"
+        },
+        "model": {
+          "n_estimators": 100,
+          "learning_rate": 0.05,
+          "num_leaves": 15,
+          "min_data_in_leaf": 5,
+          "max_depth": -1,
+          "calibration_fraction": 0.2
+        },
+        "strategy": {
+          "confidence_threshold": 0.55,
+          "notional_fraction": 0.5,
+          "allow_short": true
+        },
+        "wfo": {
+          "train_bars": 1095,
+          "test_bars": 180,
+          "step_bars": 180,
+          "expanding": false
+        },
+        "backtest": {
+          "initial_equity": 10000.0,
+          "fee_bps": 5.5,
+          "slippage_bps": 5.0,
+          "bars_per_year": 365
+        },
+        "gates": {
+          "max_fold_drawdown_pct": 15.0,
+          "min_pct_folds_positive_cas": 0.5,
+          "min_fills_per_fold": 0,
+          "min_folds_with_trades": 3,
+          "max_annualized_turnover": 50.0
+        }
+      },
+      "result": {
+        "spec": {
+          "name": "baseline_eth_daily_v1__mode=3class__horizon_bars=10__features=n12",
+          "data": {
+            "csv_path": "ETHUSDT_D_5y.csv",
+            "symbol": "ETHUSDT",
+            "interval": "D"
+          },
+          "features": [
+            "log_return@5",
+            "realized_vol@20",
+            "atr@14",
+            "macd_hist@12_26_9",
+            "rsi_close@14",
+            "time_of_day@sin",
+            "time_of_day@cos",
+            "day_of_week@sin",
+            "day_of_week@cos",
+            "return_skew@20",
+            "return_kurtosis@20",
+            "vol_regime@20_120"
+          ],
+          "label": {
+            "kind": "triple_barrier",
+            "horizon_bars": 10,
+            "up_pct": 0.1,
+            "down_pct": 0.1,
+            "mode": "3class"
+          },
+          "model": {
+            "n_estimators": 100,
+            "learning_rate": 0.05,
+            "num_leaves": 15,
+            "min_data_in_leaf": 5,
+            "max_depth": -1,
+            "calibration_fraction": 0.2
+          },
+          "strategy": {
+            "confidence_threshold": 0.55,
+            "notional_fraction": 0.5,
+            "allow_short": true
+          },
+          "wfo": {
+            "train_bars": 1095,
+            "test_bars": 180,
+            "step_bars": 180,
+            "expanding": false
+          },
+          "backtest": {
+            "initial_equity": 10000.0,
+            "fee_bps": 5.5,
+            "slippage_bps": 5.0,
+            "bars_per_year": 365
+          },
+          "gates": {
+            "max_fold_drawdown_pct": 15.0,
+            "min_pct_folds_positive_cas": 0.5,
+            "min_fills_per_fold": 0,
+            "min_folds_with_trades": 3,
+            "max_annualized_turnover": 50.0
+          }
+        },
+        "spec_fingerprint": "6ced45110a54bb38a4c242d14fd3aecacd21e5c45a0f69cb0caac93f3f32ad16",
+        "generated_at": "2026-08-08T05:32:56.339775+00:00",
+        "code_git_sha": "6e3f50b2e66e372c98036dfe3cf04e6a8e77e998",
+        "lockfile_sha": "9750eaffca2c952090be8a24a3176cb3b3eaf8da2eb4e50c54d29f43d130b436",
+        "n_bars": 1826,
+        "folds": [
+          {
+            "train_start": 0,
+            "train_end": 1095,
+            "test_start": 1095,
+            "test_end": 1275,
+            "reproducibility_hash": "bd934564146baa367e425a1f63f61b9e83a0661bbad60c607a35d32aa01e7f45",
+            "n_fills": 13,
+            "total_return_pct": 1.3004432102773356,
+            "sharpe": 0.3090837096047604,
+            "cost_adjusted_sharpe": 0.24916180145849773,
+            "max_drawdown_pct": 2.988959078042941,
+            "hit_rate": 0.5,
+            "turnover": 5.0026656802196525
+          },
+          {
+            "train_start": 180,
+            "train_end": 1275,
+            "test_start": 1275,
+            "test_end": 1455,
+            "reproducibility_hash": "bd934564146baa367e425a1f63f61b9e83a0661bbad60c607a35d32aa01e7f45",
+            "n_fills": 14,
+            "total_return_pct": -0.5840624877839762,
+            "sharpe": -0.1101829113823645,
+            "cost_adjusted_sharpe": -0.16191545199124185,
+            "max_drawdown_pct": 3.9428338272368246,
+            "hit_rate": 0.7,
+            "turnover": 4.033172333392502
+          },
+          {
+            "train_start": 360,
+            "train_end": 1455,
+            "test_start": 1455,
+            "test_end": 1635,
+            "reproducibility_hash": "bd934564146baa367e425a1f63f61b9e83a0661bbad60c607a35d32aa01e7f45",
+            "n_fills": 15,
+            "total_return_pct": 11.318039916826228,
+            "sharpe": 1.5005816853733187,
+            "cost_adjusted_sharpe": 1.4429271483476558,
+            "max_drawdown_pct": 1.665759711277448,
+            "hit_rate": 0.75,
+            "turnover": 7.712052789149723
+          },
+          {
+            "train_start": 540,
+            "train_end": 1635,
+            "test_start": 1635,
+            "test_end": 1815,
+            "reproducibility_hash": "bd934564146baa367e425a1f63f61b9e83a0661bbad60c607a35d32aa01e7f45",
+            "n_fills": 16,
+            "total_return_pct": -5.4683689850946955,
+            "sharpe": -0.47343181938105094,
+            "cost_adjusted_sharpe": -0.49787763722319056,
+            "max_drawdown_pct": 13.341696258737901,
+            "hit_rate": 0.2727272727272727,
+            "turnover": 4.647746781575549
+          }
+        ],
+        "robustness": {
+          "n_folds": 4,
+          "n_folds_with_trades": 4,
+          "pct_folds_positive_cas": 0.5,
+          "mean_cost_adjusted_sharpe": 0.2580739651479303,
+          "median_cost_adjusted_sharpe": 0.04362317473362794,
+          "min_cost_adjusted_sharpe": -0.49787763722319056,
+          "std_cost_adjusted_sharpe": 0.8469180259498783,
+          "max_fold_drawdown_pct": 13.341696258737901,
+          "mean_hit_rate": 0.5556818181818182,
+          "total_fills": 58,
+          "mean_turnover_per_fold": 5.348909396084356,
+          "annualized_turnover": 10.84639960872661,
+          "consistency_score": -0.7178810433759132
+        },
+        "gate": {
+          "passed": true,
+          "reasons_failed": []
+        },
+        "error": null
+      }
+    },
+    {
+      "cell_index": 4,
+      "name": "baseline_eth_daily_v1__mode=3class__horizon_bars=20__features=n5",
+      "fingerprint": "b17575a371df884036058529cff0c79b8c478c1495f8f79e2d2e5a4c6716cd45",
+      "passed": false,
+      "mean_cost_adjusted_sharpe": -0.2125626349611653,
+      "consistency_score": -0.8818903943196039,
+      "pct_folds_positive_cas": 0.5,
+      "max_fold_drawdown_pct": 30.19154514701974,
+      "annualized_turnover": 45.791100213301306,
+      "total_fills": 372,
+      "reasons_failed": [
+        "max_fold_drawdown_pct=30.19 > 15.00"
+      ],
+      "spec": {
+        "name": "baseline_eth_daily_v1__mode=3class__horizon_bars=20__features=n5",
+        "data": {
+          "csv_path": "ETHUSDT_D_5y.csv",
+          "symbol": "ETHUSDT",
+          "interval": "D"
+        },
+        "features": [
+          "log_return@5",
+          "realized_vol@20",
+          "atr@14",
+          "macd_hist@12_26_9",
+          "rsi_close@14"
+        ],
+        "label": {
+          "kind": "triple_barrier",
+          "horizon_bars": 20,
+          "up_pct": 0.1,
+          "down_pct": 0.1,
+          "mode": "3class"
+        },
+        "model": {
+          "n_estimators": 100,
+          "learning_rate": 0.05,
+          "num_leaves": 15,
+          "min_data_in_leaf": 5,
+          "max_depth": -1,
+          "calibration_fraction": 0.2
+        },
+        "strategy": {
+          "confidence_threshold": 0.55,
+          "notional_fraction": 0.5,
+          "allow_short": true
+        },
+        "wfo": {
+          "train_bars": 1095,
+          "test_bars": 180,
+          "step_bars": 180,
+          "expanding": false
+        },
+        "backtest": {
+          "initial_equity": 10000.0,
+          "fee_bps": 5.5,
+          "slippage_bps": 5.0,
+          "bars_per_year": 365
+        },
+        "gates": {
+          "max_fold_drawdown_pct": 15.0,
+          "min_pct_folds_positive_cas": 0.5,
+          "min_fills_per_fold": 0,
+          "min_folds_with_trades": 3,
+          "max_annualized_turnover": 50.0
+        }
+      },
+      "result": {
+        "spec": {
+          "name": "baseline_eth_daily_v1__mode=3class__horizon_bars=20__features=n5",
+          "data": {
+            "csv_path": "ETHUSDT_D_5y.csv",
+            "symbol": "ETHUSDT",
+            "interval": "D"
+          },
+          "features": [
+            "log_return@5",
+            "realized_vol@20",
+            "atr@14",
+            "macd_hist@12_26_9",
+            "rsi_close@14"
+          ],
+          "label": {
+            "kind": "triple_barrier",
+            "horizon_bars": 20,
+            "up_pct": 0.1,
+            "down_pct": 0.1,
+            "mode": "3class"
+          },
+          "model": {
+            "n_estimators": 100,
+            "learning_rate": 0.05,
+            "num_leaves": 15,
+            "min_data_in_leaf": 5,
+            "max_depth": -1,
+            "calibration_fraction": 0.2
+          },
+          "strategy": {
+            "confidence_threshold": 0.55,
+            "notional_fraction": 0.5,
+            "allow_short": true
+          },
+          "wfo": {
+            "train_bars": 1095,
+            "test_bars": 180,
+            "step_bars": 180,
+            "expanding": false
+          },
+          "backtest": {
+            "initial_equity": 10000.0,
+            "fee_bps": 5.5,
+            "slippage_bps": 5.0,
+            "bars_per_year": 365
+          },
+          "gates": {
+            "max_fold_drawdown_pct": 15.0,
+            "min_pct_folds_positive_cas": 0.5,
+            "min_fills_per_fold": 0,
+            "min_folds_with_trades": 3,
+            "max_annualized_turnover": 50.0
+          }
+        },
+        "spec_fingerprint": "b17575a371df884036058529cff0c79b8c478c1495f8f79e2d2e5a4c6716cd45",
+        "generated_at": "2026-08-08T05:59:37.571514+00:00",
+        "code_git_sha": "6e3f50b2e66e372c98036dfe3cf04e6a8e77e998",
+        "lockfile_sha": "9750eaffca2c952090be8a24a3176cb3b3eaf8da2eb4e50c54d29f43d130b436",
+        "n_bars": 1826,
+        "folds": [
+          {
+            "train_start": 0,
+            "train_end": 1095,
+            "test_start": 1095,
+            "test_end": 1275,
+            "reproducibility_hash": "5546de687fd83372d2ccfe79d8079a43ec62af6125355d66953bc3bae1fc88ff",
+            "n_fills": 53,
+            "total_return_pct": -2.3396385119460517,
+            "sharpe": -0.17455211852644292,
+            "cost_adjusted_sharpe": -0.2804908798731428,
+            "max_drawdown_pct": 12.117280640388561,
+            "hit_rate": 0.5428571428571428,
+            "turnover": 18.935513724057387
+          },
+          {
+            "train_start": 180,
+            "train_end": 1275,
+            "test_start": 1275,
+            "test_end": 1455,
+            "reproducibility_hash": "5546de687fd83372d2ccfe79d8079a43ec62af6125355d66953bc3bae1fc88ff",
+            "n_fills": 148,
+            "total_return_pct": -22.8254827843848,
+            "sharpe": -1.2091717648110816,
+            "cost_adjusted_sharpe": -1.2778498024583422,
+            "max_drawdown_pct": 30.19154514701974,
+            "hit_rate": 0.37593984962406013,
+            "turnover": 24.097959544944153
+          },
+          {
+            "train_start": 360,
+            "train_end": 1455,
+            "test_start": 1455,
+            "test_end": 1635,
+            "reproducibility_hash": "5546de687fd83372d2ccfe79d8079a43ec62af6125355d66953bc3bae1fc88ff",
+            "n_fills": 57,
+            "total_return_pct": 2.7163392087151017,
+            "sharpe": 0.36684355610877345,
+            "cost_adjusted_sharpe": 0.24641436216502696,
+            "max_drawdown_pct": 7.411970139224822,
+            "hit_rate": 0.55,
+            "turnover": 19.123148979185405
+          },
+          {
+            "train_start": 540,
+            "train_end": 1635,
+            "test_start": 1635,
+            "test_end": 1815,
+            "reproducibility_hash": "5546de687fd83372d2ccfe79d8079a43ec62af6125355d66953bc3bae1fc88ff",
+            "n_fills": 114,
+            "total_return_pct": 7.225687025263916,
+            "sharpe": 0.5637333741312898,
+            "cost_adjusted_sharpe": 0.4616757803217969,
+            "max_drawdown_pct": 21.494851507815817,
+            "hit_rate": 0.686046511627907,
+            "turnover": 28.171027487640288
+          }
+        ],
+        "robustness": {
+          "n_folds": 4,
+          "n_folds_with_trades": 4,
+          "pct_folds_positive_cas": 0.5,
+          "mean_cost_adjusted_sharpe": -0.2125626349611653,
+          "median_cost_adjusted_sharpe": -0.017038258854057922,
+          "min_cost_adjusted_sharpe": -1.2778498024583422,
+          "std_cost_adjusted_sharpe": 0.7756090768390212,
+          "max_fold_drawdown_pct": 30.19154514701974,
+          "mean_hit_rate": 0.5387108760272775,
+          "total_fills": 372,
+          "mean_turnover_per_fold": 22.58191243395681,
+          "annualized_turnover": 45.791100213301306,
+          "consistency_score": -0.8818903943196039
+        },
+        "gate": {
+          "passed": false,
+          "reasons_failed": [
+            "max_fold_drawdown_pct=30.19 > 15.00"
+          ]
+        },
+        "error": null
+      }
+    },
+    {
+      "cell_index": 5,
+      "name": "baseline_eth_daily_v1__mode=3class__horizon_bars=20__features=n12",
+      "fingerprint": "ab8da8f7c56f5512c19b4ed7552140a4029d118f6de3efe95c259ffce8a6611d",
+      "passed": false,
+      "mean_cost_adjusted_sharpe": 0.24115383346644292,
+      "consistency_score": -0.8335241189204676,
+      "pct_folds_positive_cas": 0.75,
+      "max_fold_drawdown_pct": 23.225002195582334,
+      "annualized_turnover": 27.157446332744694,
+      "total_fills": 292,
+      "reasons_failed": [
+        "max_fold_drawdown_pct=23.23 > 15.00"
+      ],
+      "spec": {
+        "name": "baseline_eth_daily_v1__mode=3class__horizon_bars=20__features=n12",
+        "data": {
+          "csv_path": "ETHUSDT_D_5y.csv",
+          "symbol": "ETHUSDT",
+          "interval": "D"
+        },
+        "features": [
+          "log_return@5",
+          "realized_vol@20",
+          "atr@14",
+          "macd_hist@12_26_9",
+          "rsi_close@14",
+          "time_of_day@sin",
+          "time_of_day@cos",
+          "day_of_week@sin",
+          "day_of_week@cos",
+          "return_skew@20",
+          "return_kurtosis@20",
+          "vol_regime@20_120"
+        ],
+        "label": {
+          "kind": "triple_barrier",
+          "horizon_bars": 20,
+          "up_pct": 0.1,
+          "down_pct": 0.1,
+          "mode": "3class"
+        },
+        "model": {
+          "n_estimators": 100,
+          "learning_rate": 0.05,
+          "num_leaves": 15,
+          "min_data_in_leaf": 5,
+          "max_depth": -1,
+          "calibration_fraction": 0.2
+        },
+        "strategy": {
+          "confidence_threshold": 0.55,
+          "notional_fraction": 0.5,
+          "allow_short": true
+        },
+        "wfo": {
+          "train_bars": 1095,
+          "test_bars": 180,
+          "step_bars": 180,
+          "expanding": false
+        },
+        "backtest": {
+          "initial_equity": 10000.0,
+          "fee_bps": 5.5,
+          "slippage_bps": 5.0,
+          "bars_per_year": 365
+        },
+        "gates": {
+          "max_fold_drawdown_pct": 15.0,
+          "min_pct_folds_positive_cas": 0.5,
+          "min_fills_per_fold": 0,
+          "min_folds_with_trades": 3,
+          "max_annualized_turnover": 50.0
+        }
+      },
+      "result": {
+        "spec": {
+          "name": "baseline_eth_daily_v1__mode=3class__horizon_bars=20__features=n12",
+          "data": {
+            "csv_path": "ETHUSDT_D_5y.csv",
+            "symbol": "ETHUSDT",
+            "interval": "D"
+          },
+          "features": [
+            "log_return@5",
+            "realized_vol@20",
+            "atr@14",
+            "macd_hist@12_26_9",
+            "rsi_close@14",
+            "time_of_day@sin",
+            "time_of_day@cos",
+            "day_of_week@sin",
+            "day_of_week@cos",
+            "return_skew@20",
+            "return_kurtosis@20",
+            "vol_regime@20_120"
+          ],
+          "label": {
+            "kind": "triple_barrier",
+            "horizon_bars": 20,
+            "up_pct": 0.1,
+            "down_pct": 0.1,
+            "mode": "3class"
+          },
+          "model": {
+            "n_estimators": 100,
+            "learning_rate": 0.05,
+            "num_leaves": 15,
+            "min_data_in_leaf": 5,
+            "max_depth": -1,
+            "calibration_fraction": 0.2
+          },
+          "strategy": {
+            "confidence_threshold": 0.55,
+            "notional_fraction": 0.5,
+            "allow_short": true
+          },
+          "wfo": {
+            "train_bars": 1095,
+            "test_bars": 180,
+            "step_bars": 180,
+            "expanding": false
+          },
+          "backtest": {
+            "initial_equity": 10000.0,
+            "fee_bps": 5.5,
+            "slippage_bps": 5.0,
+            "bars_per_year": 365
+          },
+          "gates": {
+            "max_fold_drawdown_pct": 15.0,
+            "min_pct_folds_positive_cas": 0.5,
+            "min_fills_per_fold": 0,
+            "min_folds_with_trades": 3,
+            "max_annualized_turnover": 50.0
+          }
+        },
+        "spec_fingerprint": "ab8da8f7c56f5512c19b4ed7552140a4029d118f6de3efe95c259ffce8a6611d",
+        "generated_at": "2026-08-08T06:24:25.093240+00:00",
+        "code_git_sha": "6e3f50b2e66e372c98036dfe3cf04e6a8e77e998",
+        "lockfile_sha": "9750eaffca2c952090be8a24a3176cb3b3eaf8da2eb4e50c54d29f43d130b436",
+        "n_bars": 1826,
+        "folds": [
+          {
+            "train_start": 0,
+            "train_end": 1095,
+            "test_start": 1095,
+            "test_end": 1275,
+            "reproducibility_hash": "bd934564146baa367e425a1f63f61b9e83a0661bbad60c607a35d32aa01e7f45",
+            "n_fills": 2,
+            "total_return_pct": 0.9333770667761865,
+            "sharpe": 1.0420414003731246,
+            "cost_adjusted_sharpe": 0.9800351045451138,
+            "max_drawdown_pct": 0.05305378903617264,
+            "hit_rate": 1.0,
+            "turnover": 1.0103894848844484
+          },
+          {
+            "train_start": 180,
+            "train_end": 1275,
+            "test_start": 1275,
+            "test_end": 1455,
+            "reproducibility_hash": "bd934564146baa367e425a1f63f61b9e83a0661bbad60c607a35d32aa01e7f45",
+            "n_fills": 123,
+            "total_return_pct": -18.338046937207974,
+            "sharpe": -1.1728291020819273,
+            "cost_adjusted_sharpe": -1.2511986732742701,
+            "max_drawdown_pct": 23.225002195582334,
+            "hit_rate": 0.4329896907216495,
+            "turnover": 22.715252379737287
+          },
+          {
+            "train_start": 360,
+            "train_end": 1455,
+            "test_start": 1455,
+            "test_end": 1635,
+            "reproducibility_hash": "bd934564146baa367e425a1f63f61b9e83a0661bbad60c607a35d32aa01e7f45",
+            "n_fills": 30,
+            "total_return_pct": 5.412455834827168,
+            "sharpe": 0.816003296989503,
+            "cost_adjusted_sharpe": 0.7404397432700133,
+            "max_drawdown_pct": 4.476566496019895,
+            "hit_rate": 0.5714285714285714,
+            "turnover": 9.344144856376587
+          },
+          {
+            "train_start": 540,
+            "train_end": 1635,
+            "test_start": 1635,
+            "test_end": 1815,
+            "reproducibility_hash": "bd934564146baa367e425a1f63f61b9e83a0661bbad60c607a35d32aa01e7f45",
+            "n_fills": 137,
+            "total_return_pct": 8.361169969999027,
+            "sharpe": 0.5584216921687932,
+            "cost_adjusted_sharpe": 0.4953391593249148,
+            "max_drawdown_pct": 21.494851507815817,
+            "hit_rate": 0.7559055118110236,
+            "turnover": 20.50106631893642
+          }
+        ],
+        "robustness": {
+          "n_folds": 4,
+          "n_folds_with_trades": 4,
+          "pct_folds_positive_cas": 0.75,
+          "mean_cost_adjusted_sharpe": 0.24115383346644292,
+          "median_cost_adjusted_sharpe": 0.617889451297464,
+          "min_cost_adjusted_sharpe": -1.2511986732742701,
+          "std_cost_adjusted_sharpe": 1.0143894940202998,
+          "max_fold_drawdown_pct": 23.225002195582334,
+          "mean_hit_rate": 0.6900809434903111,
+          "total_fills": 292,
+          "mean_turnover_per_fold": 13.392713259983685,
+          "annualized_turnover": 27.157446332744694,
+          "consistency_score": -0.8335241189204676
+        },
+        "gate": {
+          "passed": false,
+          "reasons_failed": [
+            "max_fold_drawdown_pct=23.23 > 15.00"
+          ]
+        },
+        "error": null
+      }
+    },
+    {
+      "cell_index": 6,
+      "name": "baseline_eth_daily_v1__mode=2class_directional__horizon_bars=5__features=n5",
+      "fingerprint": "56a5f2ec26e76c2c4f9fd4a84103df9b2457e808fdf4511b52e2e80205855ab4",
+      "passed": false,
+      "mean_cost_adjusted_sharpe": -0.31533249794681917,
+      "consistency_score": -0.7271850065488821,
+      "pct_folds_positive_cas": 0.5,
+      "max_fold_drawdown_pct": 19.199407117571955,
+      "annualized_turnover": 50.771250864729105,
+      "total_fills": 424,
+      "reasons_failed": [
+        "max_fold_drawdown_pct=19.20 > 15.00",
+        "annualized_turnover=50.77 > 50.00"
+      ],
+      "spec": {
+        "name": "baseline_eth_daily_v1__mode=2class_directional__horizon_bars=5__features=n5",
+        "data": {
+          "csv_path": "ETHUSDT_D_5y.csv",
+          "symbol": "ETHUSDT",
+          "interval": "D"
+        },
+        "features": [
+          "log_return@5",
+          "realized_vol@20",
+          "atr@14",
+          "macd_hist@12_26_9",
+          "rsi_close@14"
+        ],
+        "label": {
+          "kind": "triple_barrier",
+          "horizon_bars": 5,
+          "up_pct": 0.1,
+          "down_pct": 0.1,
+          "mode": "2class_directional"
+        },
+        "model": {
+          "n_estimators": 100,
+          "learning_rate": 0.05,
+          "num_leaves": 15,
+          "min_data_in_leaf": 5,
+          "max_depth": -1,
+          "calibration_fraction": 0.2
+        },
+        "strategy": {
+          "confidence_threshold": 0.55,
+          "notional_fraction": 0.5,
+          "allow_short": true
+        },
+        "wfo": {
+          "train_bars": 1095,
+          "test_bars": 180,
+          "step_bars": 180,
+          "expanding": false
+        },
+        "backtest": {
+          "initial_equity": 10000.0,
+          "fee_bps": 5.5,
+          "slippage_bps": 5.0,
+          "bars_per_year": 365
+        },
+        "gates": {
+          "max_fold_drawdown_pct": 15.0,
+          "min_pct_folds_positive_cas": 0.5,
+          "min_fills_per_fold": 0,
+          "min_folds_with_trades": 3,
+          "max_annualized_turnover": 50.0
+        }
+      },
+      "result": {
+        "spec": {
+          "name": "baseline_eth_daily_v1__mode=2class_directional__horizon_bars=5__features=n5",
+          "data": {
+            "csv_path": "ETHUSDT_D_5y.csv",
+            "symbol": "ETHUSDT",
+            "interval": "D"
+          },
+          "features": [
+            "log_return@5",
+            "realized_vol@20",
+            "atr@14",
+            "macd_hist@12_26_9",
+            "rsi_close@14"
+          ],
+          "label": {
+            "kind": "triple_barrier",
+            "horizon_bars": 5,
+            "up_pct": 0.1,
+            "down_pct": 0.1,
+            "mode": "2class_directional"
+          },
+          "model": {
+            "n_estimators": 100,
+            "learning_rate": 0.05,
+            "num_leaves": 15,
+            "min_data_in_leaf": 5,
+            "max_depth": -1,
+            "calibration_fraction": 0.2
+          },
+          "strategy": {
+            "confidence_threshold": 0.55,
+            "notional_fraction": 0.5,
+            "allow_short": true
+          },
+          "wfo": {
+            "train_bars": 1095,
+            "test_bars": 180,
+            "step_bars": 180,
+            "expanding": false
+          },
+          "backtest": {
+            "initial_equity": 10000.0,
+            "fee_bps": 5.5,
+            "slippage_bps": 5.0,
+            "bars_per_year": 365
+          },
+          "gates": {
+            "max_fold_drawdown_pct": 15.0,
+            "min_pct_folds_positive_cas": 0.5,
+            "min_fills_per_fold": 0,
+            "min_folds_with_trades": 3,
+            "max_annualized_turnover": 50.0
+          }
+        },
+        "spec_fingerprint": "56a5f2ec26e76c2c4f9fd4a84103df9b2457e808fdf4511b52e2e80205855ab4",
+        "generated_at": "2026-08-08T06:32:22.812368+00:00",
+        "code_git_sha": "6e3f50b2e66e372c98036dfe3cf04e6a8e77e998",
+        "lockfile_sha": "9750eaffca2c952090be8a24a3176cb3b3eaf8da2eb4e50c54d29f43d130b436",
+        "n_bars": 1826,
+        "folds": [
+          {
+            "train_start": 0,
+            "train_end": 1095,
+            "test_start": 1095,
+            "test_end": 1275,
+            "reproducibility_hash": "3fb9e175cd384084eaa810b66c8b5fa908832d1a6468cf80c127edfc357ed9d5",
+            "n_fills": 44,
+            "total_return_pct": -5.240513774655486,
+            "sharpe": -0.5091664236495003,
+            "cost_adjusted_sharpe": -0.581028524915721,
+            "max_drawdown_pct": 9.611327960570293,
+            "hit_rate": 0.5151515151515151,
+            "turnover": 12.288482447307317
+          },
+          {
+            "train_start": 180,
+            "train_end": 1275,
+            "test_start": 1275,
+            "test_end": 1455,
+            "reproducibility_hash": "3fb9e175cd384084eaa810b66c8b5fa908832d1a6468cf80c127edfc357ed9d5",
+            "n_fills": 126,
+            "total_return_pct": 2.605782731297568,
+            "sharpe": 0.2703854346993145,
+            "cost_adjusted_sharpe": 0.16939615236332373,
+            "max_drawdown_pct": 16.26376610914877,
+            "hit_rate": 0.45454545454545453,
+            "turnover": 29.75126251485526
+          },
+          {
+            "train_start": 360,
+            "train_end": 1455,
+            "test_start": 1455,
+            "test_end": 1635,
+            "reproducibility_hash": "3fb9e175cd384084eaa810b66c8b5fa908832d1a6468cf80c127edfc357ed9d5",
+            "n_fills": 158,
+            "total_return_pct": 2.1137862443978417,
+            "sharpe": 0.24252514137024733,
+            "cost_adjusted_sharpe": 0.14238613177303233,
+            "max_drawdown_pct": 14.808916783605408,
+            "hit_rate": 0.5131578947368421,
+            "turnover": 36.64928947080651
+          },
+          {
+            "train_start": 540,
+            "train_end": 1635,
+            "test_start": 1635,
+            "test_end": 1815,
+            "reproducibility_hash": "3fb9e175cd384084eaa810b66c8b5fa908832d1a6468cf80c127edfc357ed9d5",
+            "n_fills": 96,
+            "total_return_pct": -14.030522015262337,
+            "sharpe": -0.9128095494680369,
+            "cost_adjusted_sharpe": -0.9920837510079118,
+            "max_drawdown_pct": 19.199407117571955,
+            "hit_rate": 0.5428571428571428,
+            "turnover": 21.462474122112987
+          }
+        ],
+        "robustness": {
+          "n_folds": 4,
+          "n_folds_with_trades": 4,
+          "pct_folds_positive_cas": 0.5,
+          "mean_cost_adjusted_sharpe": -0.31533249794681917,
+          "median_cost_adjusted_sharpe": -0.21932119657134433,
+          "min_cost_adjusted_sharpe": -0.9920837510079118,
+          "std_cost_adjusted_sharpe": 0.5695187575754725,
+          "max_fold_drawdown_pct": 19.199407117571955,
+          "mean_hit_rate": 0.5064280018227386,
+          "total_fills": 424,
+          "mean_turnover_per_fold": 25.03787713877052,
+          "annualized_turnover": 50.771250864729105,
+          "consistency_score": -0.7271850065488821
+        },
+        "gate": {
+          "passed": false,
+          "reasons_failed": [
+            "max_fold_drawdown_pct=19.20 > 15.00",
+            "annualized_turnover=50.77 > 50.00"
+          ]
+        },
+        "error": null
+      }
+    },
+    {
+      "cell_index": 7,
+      "name": "baseline_eth_daily_v1__mode=2class_directional__horizon_bars=5__features=n12",
+      "fingerprint": "0ca78edaaf1696c42edc668427c25c52ea73daff3a1c4205e7688e5e87f35374",
+      "passed": false,
+      "mean_cost_adjusted_sharpe": -0.052824278011671555,
+      "consistency_score": -0.8472292562552125,
+      "pct_folds_positive_cas": 0.25,
+      "max_fold_drawdown_pct": 45.240208373334745,
+      "annualized_turnover": 26.934224623746065,
+      "total_fills": 302,
+      "reasons_failed": [
+        "max_fold_drawdown_pct=45.24 > 15.00",
+        "pct_folds_positive_cas=0.25 < 0.50"
+      ],
+      "spec": {
+        "name": "baseline_eth_daily_v1__mode=2class_directional__horizon_bars=5__features=n12",
+        "data": {
+          "csv_path": "ETHUSDT_D_5y.csv",
+          "symbol": "ETHUSDT",
+          "interval": "D"
+        },
+        "features": [
+          "log_return@5",
+          "realized_vol@20",
+          "atr@14",
+          "macd_hist@12_26_9",
+          "rsi_close@14",
+          "time_of_day@sin",
+          "time_of_day@cos",
+          "day_of_week@sin",
+          "day_of_week@cos",
+          "return_skew@20",
+          "return_kurtosis@20",
+          "vol_regime@20_120"
+        ],
+        "label": {
+          "kind": "triple_barrier",
+          "horizon_bars": 5,
+          "up_pct": 0.1,
+          "down_pct": 0.1,
+          "mode": "2class_directional"
+        },
+        "model": {
+          "n_estimators": 100,
+          "learning_rate": 0.05,
+          "num_leaves": 15,
+          "min_data_in_leaf": 5,
+          "max_depth": -1,
+          "calibration_fraction": 0.2
+        },
+        "strategy": {
+          "confidence_threshold": 0.55,
+          "notional_fraction": 0.5,
+          "allow_short": true
+        },
+        "wfo": {
+          "train_bars": 1095,
+          "test_bars": 180,
+          "step_bars": 180,
+          "expanding": false
+        },
+        "backtest": {
+          "initial_equity": 10000.0,
+          "fee_bps": 5.5,
+          "slippage_bps": 5.0,
+          "bars_per_year": 365
+        },
+        "gates": {
+          "max_fold_drawdown_pct": 15.0,
+          "min_pct_folds_positive_cas": 0.5,
+          "min_fills_per_fold": 0,
+          "min_folds_with_trades": 3,
+          "max_annualized_turnover": 50.0
+        }
+      },
+      "result": {
+        "spec": {
+          "name": "baseline_eth_daily_v1__mode=2class_directional__horizon_bars=5__features=n12",
+          "data": {
+            "csv_path": "ETHUSDT_D_5y.csv",
+            "symbol": "ETHUSDT",
+            "interval": "D"
+          },
+          "features": [
+            "log_return@5",
+            "realized_vol@20",
+            "atr@14",
+            "macd_hist@12_26_9",
+            "rsi_close@14",
+            "time_of_day@sin",
+            "time_of_day@cos",
+            "day_of_week@sin",
+            "day_of_week@cos",
+            "return_skew@20",
+            "return_kurtosis@20",
+            "vol_regime@20_120"
+          ],
+          "label": {
+            "kind": "triple_barrier",
+            "horizon_bars": 5,
+            "up_pct": 0.1,
+            "down_pct": 0.1,
+            "mode": "2class_directional"
+          },
+          "model": {
+            "n_estimators": 100,
+            "learning_rate": 0.05,
+            "num_leaves": 15,
+            "min_data_in_leaf": 5,
+            "max_depth": -1,
+            "calibration_fraction": 0.2
+          },
+          "strategy": {
+            "confidence_threshold": 0.55,
+            "notional_fraction": 0.5,
+            "allow_short": true
+          },
+          "wfo": {
+            "train_bars": 1095,
+            "test_bars": 180,
+            "step_bars": 180,
+            "expanding": false
+          },
+          "backtest": {
+            "initial_equity": 10000.0,
+            "fee_bps": 5.5,
+            "slippage_bps": 5.0,
+            "bars_per_year": 365
+          },
+          "gates": {
+            "max_fold_drawdown_pct": 15.0,
+            "min_pct_folds_positive_cas": 0.5,
+            "min_fills_per_fold": 0,
+            "min_folds_with_trades": 3,
+            "max_annualized_turnover": 50.0
+          }
+        },
+        "spec_fingerprint": "0ca78edaaf1696c42edc668427c25c52ea73daff3a1c4205e7688e5e87f35374",
+        "generated_at": "2026-08-08T06:40:37.128008+00:00",
+        "code_git_sha": "6e3f50b2e66e372c98036dfe3cf04e6a8e77e998",
+        "lockfile_sha": "9750eaffca2c952090be8a24a3176cb3b3eaf8da2eb4e50c54d29f43d130b436",
+        "n_bars": 1826,
+        "folds": [
+          {
+            "train_start": 0,
+            "train_end": 1095,
+            "test_start": 1095,
+            "test_end": 1275,
+            "reproducibility_hash": "09c683b77cc6bd69923a854f0f5b9c99966d8050956bf4b93494832caad4fe3c",
+            "n_fills": 0,
+            "total_return_pct": 0.0,
+            "sharpe": 0.0,
+            "cost_adjusted_sharpe": 0.0,
+            "max_drawdown_pct": 0.0,
+            "hit_rate": 0.0,
+            "turnover": 0.0
+          },
+          {
+            "train_start": 180,
+            "train_end": 1275,
+            "test_start": 1275,
+            "test_end": 1455,
+            "reproducibility_hash": "09c683b77cc6bd69923a854f0f5b9c99966d8050956bf4b93494832caad4fe3c",
+            "n_fills": 141,
+            "total_return_pct": -29.567906728688907,
+            "sharpe": -1.0837228110761092,
+            "cost_adjusted_sharpe": -1.0989100256300952,
+            "max_drawdown_pct": 45.240208373334745,
+            "hit_rate": 0.4098360655737705,
+            "turnover": 7.703514940452977
+          },
+          {
+            "train_start": 360,
+            "train_end": 1455,
+            "test_start": 1455,
+            "test_end": 1635,
+            "reproducibility_hash": "09c683b77cc6bd69923a854f0f5b9c99966d8050956bf4b93494832caad4fe3c",
+            "n_fills": 105,
+            "total_return_pct": 16.494776014010036,
+            "sharpe": 1.0549391492262894,
+            "cost_adjusted_sharpe": 0.9420102599189112,
+            "max_drawdown_pct": 7.2886777893859005,
+            "hit_rate": 0.6027397260273972,
+            "turnover": 32.73840300403567
+          },
+          {
+            "train_start": 540,
+            "train_end": 1635,
+            "test_start": 1635,
+            "test_end": 1815,
+            "reproducibility_hash": "09c683b77cc6bd69923a854f0f5b9c99966d8050956bf4b93494832caad4fe3c",
+            "n_fills": 56,
+            "total_return_pct": -0.719447714113508,
+            "sharpe": 0.006648456814988327,
+            "cost_adjusted_sharpe": -0.05439734633550218,
+            "max_drawdown_pct": 11.448674282074434,
+            "hit_rate": 0.5581395348837209,
+            "turnover": 12.688607340709073
+          }
+        ],
+        "robustness": {
+          "n_folds": 4,
+          "n_folds_with_trades": 3,
+          "pct_folds_positive_cas": 0.25,
+          "mean_cost_adjusted_sharpe": -0.052824278011671555,
+          "median_cost_adjusted_sharpe": -0.02719867316775109,
+          "min_cost_adjusted_sharpe": -1.0989100256300952,
+          "std_cost_adjusted_sharpe": 0.8340231867522946,
+          "max_fold_drawdown_pct": 45.240208373334745,
+          "mean_hit_rate": 0.5235717754949629,
+          "total_fills": 302,
+          "mean_turnover_per_fold": 13.28263132129943,
+          "annualized_turnover": 26.934224623746065,
+          "consistency_score": -0.8472292562552125
+        },
+        "gate": {
+          "passed": false,
+          "reasons_failed": [
+            "max_fold_drawdown_pct=45.24 > 15.00",
+            "pct_folds_positive_cas=0.25 < 0.50"
+          ]
+        },
+        "error": null
+      }
+    },
+    {
+      "cell_index": 8,
+      "name": "baseline_eth_daily_v1__mode=2class_directional__horizon_bars=10__features=n5",
+      "fingerprint": "cb00220bc41cdac492ffc0cf5d2c5172d2ad2d10b7d14787def3baca2fe99dc4",
+      "passed": false,
+      "mean_cost_adjusted_sharpe": -0.5734680314645939,
+      "consistency_score": -2.0594808653582715,
+      "pct_folds_positive_cas": 0.5,
+      "max_fold_drawdown_pct": 33.560267856955136,
+      "annualized_turnover": 46.08257052214816,
+      "total_fills": 362,
+      "reasons_failed": [
+        "max_fold_drawdown_pct=33.56 > 15.00"
+      ],
+      "spec": {
+        "name": "baseline_eth_daily_v1__mode=2class_directional__horizon_bars=10__features=n5",
+        "data": {
+          "csv_path": "ETHUSDT_D_5y.csv",
+          "symbol": "ETHUSDT",
+          "interval": "D"
+        },
+        "features": [
+          "log_return@5",
+          "realized_vol@20",
+          "atr@14",
+          "macd_hist@12_26_9",
+          "rsi_close@14"
+        ],
+        "label": {
+          "kind": "triple_barrier",
+          "horizon_bars": 10,
+          "up_pct": 0.1,
+          "down_pct": 0.1,
+          "mode": "2class_directional"
+        },
+        "model": {
+          "n_estimators": 100,
+          "learning_rate": 0.05,
+          "num_leaves": 15,
+          "min_data_in_leaf": 5,
+          "max_depth": -1,
+          "calibration_fraction": 0.2
+        },
+        "strategy": {
+          "confidence_threshold": 0.55,
+          "notional_fraction": 0.5,
+          "allow_short": true
+        },
+        "wfo": {
+          "train_bars": 1095,
+          "test_bars": 180,
+          "step_bars": 180,
+          "expanding": false
+        },
+        "backtest": {
+          "initial_equity": 10000.0,
+          "fee_bps": 5.5,
+          "slippage_bps": 5.0,
+          "bars_per_year": 365
+        },
+        "gates": {
+          "max_fold_drawdown_pct": 15.0,
+          "min_pct_folds_positive_cas": 0.5,
+          "min_fills_per_fold": 0,
+          "min_folds_with_trades": 3,
+          "max_annualized_turnover": 50.0
+        }
+      },
+      "result": {
+        "spec": {
+          "name": "baseline_eth_daily_v1__mode=2class_directional__horizon_bars=10__features=n5",
+          "data": {
+            "csv_path": "ETHUSDT_D_5y.csv",
+            "symbol": "ETHUSDT",
+            "interval": "D"
+          },
+          "features": [
+            "log_return@5",
+            "realized_vol@20",
+            "atr@14",
+            "macd_hist@12_26_9",
+            "rsi_close@14"
+          ],
+          "label": {
+            "kind": "triple_barrier",
+            "horizon_bars": 10,
+            "up_pct": 0.1,
+            "down_pct": 0.1,
+            "mode": "2class_directional"
+          },
+          "model": {
+            "n_estimators": 100,
+            "learning_rate": 0.05,
+            "num_leaves": 15,
+            "min_data_in_leaf": 5,
+            "max_depth": -1,
+            "calibration_fraction": 0.2
+          },
+          "strategy": {
+            "confidence_threshold": 0.55,
+            "notional_fraction": 0.5,
+            "allow_short": true
+          },
+          "wfo": {
+            "train_bars": 1095,
+            "test_bars": 180,
+            "step_bars": 180,
+            "expanding": false
+          },
+          "backtest": {
+            "initial_equity": 10000.0,
+            "fee_bps": 5.5,
+            "slippage_bps": 5.0,
+            "bars_per_year": 365
+          },
+          "gates": {
+            "max_fold_drawdown_pct": 15.0,
+            "min_pct_folds_positive_cas": 0.5,
+            "min_fills_per_fold": 0,
+            "min_folds_with_trades": 3,
+            "max_annualized_turnover": 50.0
+          }
+        },
+        "spec_fingerprint": "cb00220bc41cdac492ffc0cf5d2c5172d2ad2d10b7d14787def3baca2fe99dc4",
+        "generated_at": "2026-08-08T06:51:03.085661+00:00",
+        "code_git_sha": "6e3f50b2e66e372c98036dfe3cf04e6a8e77e998",
+        "lockfile_sha": "9750eaffca2c952090be8a24a3176cb3b3eaf8da2eb4e50c54d29f43d130b436",
+        "n_bars": 1826,
+        "folds": [
+          {
+            "train_start": 0,
+            "train_end": 1095,
+            "test_start": 1095,
+            "test_end": 1275,
+            "reproducibility_hash": "3fb9e175cd384084eaa810b66c8b5fa908832d1a6468cf80c127edfc357ed9d5",
+            "n_fills": 120,
+            "total_return_pct": 12.989474184813488,
+            "sharpe": 0.9019208634211533,
+            "cost_adjusted_sharpe": 0.7614788904250346,
+            "max_drawdown_pct": 10.12030937459867,
+            "hit_rate": 0.4891304347826087,
+            "turnover": 39.08210752715883
+          },
+          {
+            "train_start": 180,
+            "train_end": 1275,
+            "test_start": 1275,
+            "test_end": 1455,
+            "reproducibility_hash": "3fb9e175cd384084eaa810b66c8b5fa908832d1a6468cf80c127edfc357ed9d5",
+            "n_fills": 41,
+            "total_return_pct": -29.296999884298124,
+            "sharpe": -2.5956084858370945,
+            "cost_adjusted_sharpe": -2.6480200659869584,
+            "max_drawdown_pct": 30.620199664000726,
+            "hit_rate": 0.46153846153846156,
+            "turnover": 12.28962734201215
+          },
+          {
+            "train_start": 360,
+            "train_end": 1455,
+            "test_start": 1455,
+            "test_end": 1635,
+            "reproducibility_hash": "3fb9e175cd384084eaa810b66c8b5fa908832d1a6468cf80c127edfc357ed9d5",
+            "n_fills": 47,
+            "total_return_pct": 8.888022481200819,
+            "sharpe": 1.1575841088147476,
+            "cost_adjusted_sharpe": 1.034990427242897,
+            "max_drawdown_pct": 6.038787051397643,
+            "hit_rate": 0.6451612903225806,
+            "turnover": 17.179294015108038
+          },
+          {
+            "train_start": 540,
+            "train_end": 1635,
+            "test_start": 1635,
+            "test_end": 1815,
+            "reproducibility_hash": "3fb9e175cd384084eaa810b66c8b5fa908832d1a6468cf80c127edfc357ed9d5",
+            "n_fills": 154,
+            "total_return_pct": -25.051778641860146,
+            "sharpe": -1.377941102901406,
+            "cost_adjusted_sharpe": -1.4423213775393486,
+            "max_drawdown_pct": 33.560267856955136,
+            "hit_rate": 0.4304635761589404,
+            "turnover": 22.351575981328306
+          }
+        ],
+        "robustness": {
+          "n_folds": 4,
+          "n_folds_with_trades": 4,
+          "pct_folds_positive_cas": 0.5,
+          "mean_cost_adjusted_sharpe": -0.5734680314645939,
+          "median_cost_adjusted_sharpe": -0.340421243557157,
+          "min_cost_adjusted_sharpe": -2.6480200659869584,
+          "std_cost_adjusted_sharpe": 1.7727468496259744,
+          "max_fold_drawdown_pct": 33.560267856955136,
+          "mean_hit_rate": 0.5065734407006478,
+          "total_fills": 362,
+          "mean_turnover_per_fold": 22.725651216401832,
+          "annualized_turnover": 46.08257052214816,
+          "consistency_score": -2.0594808653582715
+        },
+        "gate": {
+          "passed": false,
+          "reasons_failed": [
+            "max_fold_drawdown_pct=33.56 > 15.00"
+          ]
+        },
+        "error": null
+      }
+    },
+    {
+      "cell_index": 9,
+      "name": "baseline_eth_daily_v1__mode=2class_directional__horizon_bars=10__features=n12",
+      "fingerprint": "37671930e2b415fa0eb313535cc9f1e920249f022d466e820b081aa0edc52e22",
+      "passed": true,
+      "mean_cost_adjusted_sharpe": 0.3408908276787166,
+      "consistency_score": -0.3737709812262403,
+      "pct_folds_positive_cas": 0.5,
+      "max_fold_drawdown_pct": 12.914547975576296,
+      "annualized_turnover": 19.916034303322427,
+      "total_fills": 171,
+      "reasons_failed": [],
+      "spec": {
+        "name": "baseline_eth_daily_v1__mode=2class_directional__horizon_bars=10__features=n12",
+        "data": {
+          "csv_path": "ETHUSDT_D_5y.csv",
+          "symbol": "ETHUSDT",
+          "interval": "D"
+        },
+        "features": [
+          "log_return@5",
+          "realized_vol@20",
+          "atr@14",
+          "macd_hist@12_26_9",
+          "rsi_close@14",
+          "time_of_day@sin",
+          "time_of_day@cos",
+          "day_of_week@sin",
+          "day_of_week@cos",
+          "return_skew@20",
+          "return_kurtosis@20",
+          "vol_regime@20_120"
+        ],
+        "label": {
+          "kind": "triple_barrier",
+          "horizon_bars": 10,
+          "up_pct": 0.1,
+          "down_pct": 0.1,
+          "mode": "2class_directional"
+        },
+        "model": {
+          "n_estimators": 100,
+          "learning_rate": 0.05,
+          "num_leaves": 15,
+          "min_data_in_leaf": 5,
+          "max_depth": -1,
+          "calibration_fraction": 0.2
+        },
+        "strategy": {
+          "confidence_threshold": 0.55,
+          "notional_fraction": 0.5,
+          "allow_short": true
+        },
+        "wfo": {
+          "train_bars": 1095,
+          "test_bars": 180,
+          "step_bars": 180,
+          "expanding": false
+        },
+        "backtest": {
+          "initial_equity": 10000.0,
+          "fee_bps": 5.5,
+          "slippage_bps": 5.0,
+          "bars_per_year": 365
+        },
+        "gates": {
+          "max_fold_drawdown_pct": 15.0,
+          "min_pct_folds_positive_cas": 0.5,
+          "min_fills_per_fold": 0,
+          "min_folds_with_trades": 3,
+          "max_annualized_turnover": 50.0
+        }
+      },
+      "result": {
+        "spec": {
+          "name": "baseline_eth_daily_v1__mode=2class_directional__horizon_bars=10__features=n12",
+          "data": {
+            "csv_path": "ETHUSDT_D_5y.csv",
+            "symbol": "ETHUSDT",
+            "interval": "D"
+          },
+          "features": [
+            "log_return@5",
+            "realized_vol@20",
+            "atr@14",
+            "macd_hist@12_26_9",
+            "rsi_close@14",
+            "time_of_day@sin",
+            "time_of_day@cos",
+            "day_of_week@sin",
+            "day_of_week@cos",
+            "return_skew@20",
+            "return_kurtosis@20",
+            "vol_regime@20_120"
+          ],
+          "label": {
+            "kind": "triple_barrier",
+            "horizon_bars": 10,
+            "up_pct": 0.1,
+            "down_pct": 0.1,
+            "mode": "2class_directional"
+          },
+          "model": {
+            "n_estimators": 100,
+            "learning_rate": 0.05,
+            "num_leaves": 15,
+            "min_data_in_leaf": 5,
+            "max_depth": -1,
+            "calibration_fraction": 0.2
+          },
+          "strategy": {
+            "confidence_threshold": 0.55,
+            "notional_fraction": 0.5,
+            "allow_short": true
+          },
+          "wfo": {
+            "train_bars": 1095,
+            "test_bars": 180,
+            "step_bars": 180,
+            "expanding": false
+          },
+          "backtest": {
+            "initial_equity": 10000.0,
+            "fee_bps": 5.5,
+            "slippage_bps": 5.0,
+            "bars_per_year": 365
+          },
+          "gates": {
+            "max_fold_drawdown_pct": 15.0,
+            "min_pct_folds_positive_cas": 0.5,
+            "min_fills_per_fold": 0,
+            "min_folds_with_trades": 3,
+            "max_annualized_turnover": 50.0
+          }
+        },
+        "spec_fingerprint": "37671930e2b415fa0eb313535cc9f1e920249f022d466e820b081aa0edc52e22",
+        "generated_at": "2026-08-08T06:59:36.247672+00:00",
+        "code_git_sha": "6e3f50b2e66e372c98036dfe3cf04e6a8e77e998",
+        "lockfile_sha": "9750eaffca2c952090be8a24a3176cb3b3eaf8da2eb4e50c54d29f43d130b436",
+        "n_bars": 1826,
+        "folds": [
+          {
+            "train_start": 0,
+            "train_end": 1095,
+            "test_start": 1095,
+            "test_end": 1275,
+            "reproducibility_hash": "09c683b77cc6bd69923a854f0f5b9c99966d8050956bf4b93494832caad4fe3c",
+            "n_fills": 0,
+            "total_return_pct": 0.0,
+            "sharpe": 0.0,
+            "cost_adjusted_sharpe": 0.0,
+            "max_drawdown_pct": 0.0,
+            "hit_rate": 0.0,
+            "turnover": 0.0
+          },
+          {
+            "train_start": 180,
+            "train_end": 1275,
+            "test_start": 1275,
+            "test_end": 1455,
+            "reproducibility_hash": "09c683b77cc6bd69923a854f0f5b9c99966d8050956bf4b93494832caad4fe3c",
+            "n_fills": 18,
+            "total_return_pct": -1.5617586119576976,
+            "sharpe": -0.1942284311685997,
+            "cost_adjusted_sharpe": -0.23581665177485914,
+            "max_drawdown_pct": 7.072606425014305,
+            "hit_rate": 0.46153846153846156,
+            "turnover": 5.05251254951671
+          },
+          {
+            "train_start": 360,
+            "train_end": 1455,
+            "test_start": 1455,
+            "test_end": 1635,
+            "reproducibility_hash": "09c683b77cc6bd69923a854f0f5b9c99966d8050956bf4b93494832caad4fe3c",
+            "n_fills": 25,
+            "total_return_pct": 4.977973346344333,
+            "sharpe": 0.9973647248711236,
+            "cost_adjusted_sharpe": 0.8964449658590563,
+            "max_drawdown_pct": 1.9851269999096144,
+            "hit_rate": 0.625,
+            "turnover": 9.218626051134818
+          },
+          {
+            "train_start": 540,
+            "train_end": 1635,
+            "test_start": 1635,
+            "test_end": 1815,
+            "reproducibility_hash": "09c683b77cc6bd69923a854f0f5b9c99966d8050956bf4b93494832caad4fe3c",
+            "n_fills": 128,
+            "total_return_pct": 12.276258368876935,
+            "sharpe": 0.7836432673373492,
+            "cost_adjusted_sharpe": 0.7029349966306693,
+            "max_drawdown_pct": 12.914547975576296,
+            "hit_rate": 0.6923076923076923,
+            "turnover": 25.01528523055984
+          }
+        ],
+        "robustness": {
+          "n_folds": 4,
+          "n_folds_with_trades": 3,
+          "pct_folds_positive_cas": 0.5,
+          "mean_cost_adjusted_sharpe": 0.3408908276787166,
+          "median_cost_adjusted_sharpe": 0.35146749831533464,
+          "min_cost_adjusted_sharpe": -0.23581665177485914,
+          "std_cost_adjusted_sharpe": 0.5442163950655986,
+          "max_fold_drawdown_pct": 12.914547975576296,
+          "mean_hit_rate": 0.592948717948718,
+          "total_fills": 171,
+          "mean_turnover_per_fold": 9.821605957802841,
+          "annualized_turnover": 19.916034303322427,
+          "consistency_score": -0.3737709812262403
+        },
+        "gate": {
+          "passed": true,
+          "reasons_failed": []
+        },
+        "error": null
+      }
+    },
+    {
+      "cell_index": 10,
+      "name": "baseline_eth_daily_v1__mode=2class_directional__horizon_bars=20__features=n5",
+      "fingerprint": "db0fa05c53df27d4e8d4bf5d0be64ed5ba33fdfb3a4c3e5dca1afc5a6ac3284d",
+      "passed": false,
+      "mean_cost_adjusted_sharpe": -0.7754524030257607,
+      "consistency_score": -0.5986691908420088,
+      "pct_folds_positive_cas": 0.0,
+      "max_fold_drawdown_pct": 38.909688822692075,
+      "annualized_turnover": 31.46020506623832,
+      "total_fills": 495,
+      "reasons_failed": [
+        "max_fold_drawdown_pct=38.91 > 15.00",
+        "pct_folds_positive_cas=0.00 < 0.50"
+      ],
+      "spec": {
+        "name": "baseline_eth_daily_v1__mode=2class_directional__horizon_bars=20__features=n5",
+        "data": {
+          "csv_path": "ETHUSDT_D_5y.csv",
+          "symbol": "ETHUSDT",
+          "interval": "D"
+        },
+        "features": [
+          "log_return@5",
+          "realized_vol@20",
+          "atr@14",
+          "macd_hist@12_26_9",
+          "rsi_close@14"
+        ],
+        "label": {
+          "kind": "triple_barrier",
+          "horizon_bars": 20,
+          "up_pct": 0.1,
+          "down_pct": 0.1,
+          "mode": "2class_directional"
+        },
+        "model": {
+          "n_estimators": 100,
+          "learning_rate": 0.05,
+          "num_leaves": 15,
+          "min_data_in_leaf": 5,
+          "max_depth": -1,
+          "calibration_fraction": 0.2
+        },
+        "strategy": {
+          "confidence_threshold": 0.55,
+          "notional_fraction": 0.5,
+          "allow_short": true
+        },
+        "wfo": {
+          "train_bars": 1095,
+          "test_bars": 180,
+          "step_bars": 180,
+          "expanding": false
+        },
+        "backtest": {
+          "initial_equity": 10000.0,
+          "fee_bps": 5.5,
+          "slippage_bps": 5.0,
+          "bars_per_year": 365
+        },
+        "gates": {
+          "max_fold_drawdown_pct": 15.0,
+          "min_pct_folds_positive_cas": 0.5,
+          "min_fills_per_fold": 0,
+          "min_folds_with_trades": 3,
+          "max_annualized_turnover": 50.0
+        }
+      },
+      "result": {
+        "spec": {
+          "name": "baseline_eth_daily_v1__mode=2class_directional__horizon_bars=20__features=n5",
+          "data": {
+            "csv_path": "ETHUSDT_D_5y.csv",
+            "symbol": "ETHUSDT",
+            "interval": "D"
+          },
+          "features": [
+            "log_return@5",
+            "realized_vol@20",
+            "atr@14",
+            "macd_hist@12_26_9",
+            "rsi_close@14"
+          ],
+          "label": {
+            "kind": "triple_barrier",
+            "horizon_bars": 20,
+            "up_pct": 0.1,
+            "down_pct": 0.1,
+            "mode": "2class_directional"
+          },
+          "model": {
+            "n_estimators": 100,
+            "learning_rate": 0.05,
+            "num_leaves": 15,
+            "min_data_in_leaf": 5,
+            "max_depth": -1,
+            "calibration_fraction": 0.2
+          },
+          "strategy": {
+            "confidence_threshold": 0.55,
+            "notional_fraction": 0.5,
+            "allow_short": true
+          },
+          "wfo": {
+            "train_bars": 1095,
+            "test_bars": 180,
+            "step_bars": 180,
+            "expanding": false
+          },
+          "backtest": {
+            "initial_equity": 10000.0,
+            "fee_bps": 5.5,
+            "slippage_bps": 5.0,
+            "bars_per_year": 365
+          },
+          "gates": {
+            "max_fold_drawdown_pct": 15.0,
+            "min_pct_folds_positive_cas": 0.5,
+            "min_fills_per_fold": 0,
+            "min_folds_with_trades": 3,
+            "max_annualized_turnover": 50.0
+          }
+        },
+        "spec_fingerprint": "db0fa05c53df27d4e8d4bf5d0be64ed5ba33fdfb3a4c3e5dca1afc5a6ac3284d",
+        "generated_at": "2026-08-08T07:08:59.852351+00:00",
+        "code_git_sha": "6e3f50b2e66e372c98036dfe3cf04e6a8e77e998",
+        "lockfile_sha": "9750eaffca2c952090be8a24a3176cb3b3eaf8da2eb4e50c54d29f43d130b436",
+        "n_bars": 1826,
+        "folds": [
+          {
+            "train_start": 0,
+            "train_end": 1095,
+            "test_start": 1095,
+            "test_end": 1275,
+            "reproducibility_hash": "3fb9e175cd384084eaa810b66c8b5fa908832d1a6468cf80c127edfc357ed9d5",
+            "n_fills": 56,
+            "total_return_pct": -3.874271275862151,
+            "sharpe": -0.33714148626068774,
+            "cost_adjusted_sharpe": -0.42615191773703454,
+            "max_drawdown_pct": 10.642210193287383,
+            "hit_rate": 0.5238095238095238,
+            "turnover": 15.858662676690013
+          },
+          {
+            "train_start": 180,
+            "train_end": 1275,
+            "test_start": 1275,
+            "test_end": 1455,
+            "reproducibility_hash": "3fb9e175cd384084eaa810b66c8b5fa908832d1a6468cf80c127edfc357ed9d5",
+            "n_fills": 149,
+            "total_return_pct": -29.025652394041767,
+            "sharpe": -1.5967767966822886,
+            "cost_adjusted_sharpe": -1.6569258762559353,
+            "max_drawdown_pct": 38.909688822692075,
+            "hit_rate": 0.33088235294117646,
+            "turnover": 21.624263809521718
+          },
+          {
+            "train_start": 360,
+            "train_end": 1455,
+            "test_start": 1455,
+            "test_end": 1635,
+            "reproducibility_hash": "3fb9e175cd384084eaa810b66c8b5fa908832d1a6468cf80c127edfc357ed9d5",
+            "n_fills": 153,
+            "total_return_pct": -9.3109208382274,
+            "sharpe": -0.3381134497416739,
+            "cost_adjusted_sharpe": -0.37782876104808577,
+            "max_drawdown_pct": 17.2942129289019,
+            "hit_rate": 0.3684210526315789,
+            "turnover": 14.748083151453299
+          },
+          {
+            "train_start": 540,
+            "train_end": 1635,
+            "test_start": 1635,
+            "test_end": 1815,
+            "reproducibility_hash": "3fb9e175cd384084eaa810b66c8b5fa908832d1a6468cf80c127edfc357ed9d5",
+            "n_fills": 137,
+            "total_return_pct": -11.680357656407613,
+            "sharpe": -0.6092727675247309,
+            "cost_adjusted_sharpe": -0.6409030570619871,
+            "max_drawdown_pct": 21.494851507815817,
+            "hit_rate": 0.5630252100840336,
+            "turnover": 9.827477068339327
+          }
+        ],
+        "robustness": {
+          "n_folds": 4,
+          "n_folds_with_trades": 4,
+          "pct_folds_positive_cas": 0.0,
+          "mean_cost_adjusted_sharpe": -0.7754524030257607,
+          "median_cost_adjusted_sharpe": -0.5335274873995108,
+          "min_cost_adjusted_sharpe": -1.6569258762559353,
+          "std_cost_adjusted_sharpe": 0.5986691908420088,
+          "max_fold_drawdown_pct": 38.909688822692075,
+          "mean_hit_rate": 0.44653453486657824,
+          "total_fills": 495,
+          "mean_turnover_per_fold": 15.51462167650109,
+          "annualized_turnover": 31.46020506623832,
+          "consistency_score": -0.5986691908420088
+        },
+        "gate": {
+          "passed": false,
+          "reasons_failed": [
+            "max_fold_drawdown_pct=38.91 > 15.00",
+            "pct_folds_positive_cas=0.00 < 0.50"
+          ]
+        },
+        "error": null
+      }
+    },
+    {
+      "cell_index": 11,
+      "name": "baseline_eth_daily_v1__mode=2class_directional__horizon_bars=20__features=n12",
+      "fingerprint": "67ffb184fdbf22a221223ecd61c648a61da0f974d9be9921e9191bd6928589f7",
+      "passed": false,
+      "mean_cost_adjusted_sharpe": -0.42679890143376453,
+      "consistency_score": -1.608569753698589,
+      "pct_folds_positive_cas": 0.5,
+      "max_fold_drawdown_pct": 36.06773011787339,
+      "annualized_turnover": 28.992973544676957,
+      "total_fills": 371,
+      "reasons_failed": [
+        "max_fold_drawdown_pct=36.07 > 15.00"
+      ],
+      "spec": {
+        "name": "baseline_eth_daily_v1__mode=2class_directional__horizon_bars=20__features=n12",
+        "data": {
+          "csv_path": "ETHUSDT_D_5y.csv",
+          "symbol": "ETHUSDT",
+          "interval": "D"
+        },
+        "features": [
+          "log_return@5",
+          "realized_vol@20",
+          "atr@14",
+          "macd_hist@12_26_9",
+          "rsi_close@14",
+          "time_of_day@sin",
+          "time_of_day@cos",
+          "day_of_week@sin",
+          "day_of_week@cos",
+          "return_skew@20",
+          "return_kurtosis@20",
+          "vol_regime@20_120"
+        ],
+        "label": {
+          "kind": "triple_barrier",
+          "horizon_bars": 20,
+          "up_pct": 0.1,
+          "down_pct": 0.1,
+          "mode": "2class_directional"
+        },
+        "model": {
+          "n_estimators": 100,
+          "learning_rate": 0.05,
+          "num_leaves": 15,
+          "min_data_in_leaf": 5,
+          "max_depth": -1,
+          "calibration_fraction": 0.2
+        },
+        "strategy": {
+          "confidence_threshold": 0.55,
+          "notional_fraction": 0.5,
+          "allow_short": true
+        },
+        "wfo": {
+          "train_bars": 1095,
+          "test_bars": 180,
+          "step_bars": 180,
+          "expanding": false
+        },
+        "backtest": {
+          "initial_equity": 10000.0,
+          "fee_bps": 5.5,
+          "slippage_bps": 5.0,
+          "bars_per_year": 365
+        },
+        "gates": {
+          "max_fold_drawdown_pct": 15.0,
+          "min_pct_folds_positive_cas": 0.5,
+          "min_fills_per_fold": 0,
+          "min_folds_with_trades": 3,
+          "max_annualized_turnover": 50.0
+        }
+      },
+      "result": {
+        "spec": {
+          "name": "baseline_eth_daily_v1__mode=2class_directional__horizon_bars=20__features=n12",
+          "data": {
+            "csv_path": "ETHUSDT_D_5y.csv",
+            "symbol": "ETHUSDT",
+            "interval": "D"
+          },
+          "features": [
+            "log_return@5",
+            "realized_vol@20",
+            "atr@14",
+            "macd_hist@12_26_9",
+            "rsi_close@14",
+            "time_of_day@sin",
+            "time_of_day@cos",
+            "day_of_week@sin",
+            "day_of_week@cos",
+            "return_skew@20",
+            "return_kurtosis@20",
+            "vol_regime@20_120"
+          ],
+          "label": {
+            "kind": "triple_barrier",
+            "horizon_bars": 20,
+            "up_pct": 0.1,
+            "down_pct": 0.1,
+            "mode": "2class_directional"
+          },
+          "model": {
+            "n_estimators": 100,
+            "learning_rate": 0.05,
+            "num_leaves": 15,
+            "min_data_in_leaf": 5,
+            "max_depth": -1,
+            "calibration_fraction": 0.2
+          },
+          "strategy": {
+            "confidence_threshold": 0.55,
+            "notional_fraction": 0.5,
+            "allow_short": true
+          },
+          "wfo": {
+            "train_bars": 1095,
+            "test_bars": 180,
+            "step_bars": 180,
+            "expanding": false
+          },
+          "backtest": {
+            "initial_equity": 10000.0,
+            "fee_bps": 5.5,
+            "slippage_bps": 5.0,
+            "bars_per_year": 365
+          },
+          "gates": {
+            "max_fold_drawdown_pct": 15.0,
+            "min_pct_folds_positive_cas": 0.5,
+            "min_fills_per_fold": 0,
+            "min_folds_with_trades": 3,
+            "max_annualized_turnover": 50.0
+          }
+        },
+        "spec_fingerprint": "67ffb184fdbf22a221223ecd61c648a61da0f974d9be9921e9191bd6928589f7",
+        "generated_at": "2026-08-08T07:16:52.004375+00:00",
+        "code_git_sha": "6e3f50b2e66e372c98036dfe3cf04e6a8e77e998",
+        "lockfile_sha": "9750eaffca2c952090be8a24a3176cb3b3eaf8da2eb4e50c54d29f43d130b436",
+        "n_bars": 1826,
+        "folds": [
+          {
+            "train_start": 0,
+            "train_end": 1095,
+            "test_start": 1095,
+            "test_end": 1275,
+            "reproducibility_hash": "09c683b77cc6bd69923a854f0f5b9c99966d8050956bf4b93494832caad4fe3c",
+            "n_fills": 15,
+            "total_return_pct": 2.3304562939508555,
+            "sharpe": 0.5310463724010515,
+            "cost_adjusted_sharpe": 0.45753667744073906,
+            "max_drawdown_pct": 2.1390686211246734,
+            "hit_rate": 0.6666666666666666,
+            "turnover": 6.115253290029418
+          },
+          {
+            "train_start": 180,
+            "train_end": 1275,
+            "test_start": 1275,
+            "test_end": 1455,
+            "reproducibility_hash": "09c683b77cc6bd69923a854f0f5b9c99966d8050956bf4b93494832caad4fe3c",
+            "n_fills": 71,
+            "total_return_pct": -31.998252404879057,
+            "sharpe": -2.4249798516390997,
+            "cost_adjusted_sharpe": -2.492991356409652,
+            "max_drawdown_pct": 36.06773011787339,
+            "hit_rate": 0.27906976744186046,
+            "turnover": 18.89975564974035
+          },
+          {
+            "train_start": 360,
+            "train_end": 1455,
+            "test_start": 1455,
+            "test_end": 1635,
+            "reproducibility_hash": "09c683b77cc6bd69923a854f0f5b9c99966d8050956bf4b93494832caad4fe3c",
+            "n_fills": 142,
+            "total_return_pct": -1.1208166699309352,
+            "sharpe": 0.0292470110138883,
+            "cost_adjusted_sharpe": -0.04789287742172432,
+            "max_drawdown_pct": 11.21086090829574,
+            "hit_rate": 0.4049586776859504,
+            "turnover": 22.748471836836355
+          },
+          {
+            "train_start": 540,
+            "train_end": 1635,
+            "test_start": 1635,
+            "test_end": 1815,
+            "reproducibility_hash": "09c683b77cc6bd69923a854f0f5b9c99966d8050956bf4b93494832caad4fe3c",
+            "n_fills": 143,
+            "total_return_pct": 5.562829987570539,
+            "sharpe": 0.4039532428404633,
+            "cost_adjusted_sharpe": 0.37615195065557905,
+            "max_drawdown_pct": 21.494851507815817,
+            "hit_rate": 0.6846846846846847,
+            "turnover": 9.428138270427878
+          }
+        ],
+        "robustness": {
+          "n_folds": 4,
+          "n_folds_with_trades": 4,
+          "pct_folds_positive_cas": 0.5,
+          "mean_cost_adjusted_sharpe": -0.42679890143376453,
+          "median_cost_adjusted_sharpe": 0.16412953661692736,
+          "min_cost_adjusted_sharpe": -2.492991356409652,
+          "std_cost_adjusted_sharpe": 1.3951703029817066,
+          "max_fold_drawdown_pct": 36.06773011787339,
+          "mean_hit_rate": 0.5088449491197905,
+          "total_fills": 371,
+          "mean_turnover_per_fold": 14.2979047617585,
+          "annualized_turnover": 28.992973544676957,
+          "consistency_score": -1.608569753698589
+        },
+        "gate": {
+          "passed": false,
+          "reasons_failed": [
+            "max_fold_drawdown_pct=36.07 > 15.00"
+          ]
+        },
+        "error": null
+      }
+    }
+  ]
+}
