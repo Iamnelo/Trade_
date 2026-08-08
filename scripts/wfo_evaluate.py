@@ -135,8 +135,10 @@ def run_for_symbol(
         step_bars=STEP_BARS,
         expanding=False,
     )
-    print(f"[{symbol}] scheduled {len(splits)} rolling folds "
-          f"(train={TRAIN_BARS}h ~12mo, test={TEST_BARS}h ~2mo)")
+    print(
+        f"[{symbol}] scheduled {len(splits)} rolling folds "
+        f"(train={TRAIN_BARS}h ~12mo, test={TEST_BARS}h ~2mo)"
+    )
 
     features = build_features(list(FEATURE_IDS))
     config = BacktestConfig(
@@ -170,13 +172,15 @@ def run_for_symbol(
     folds = [summarize_fold(f) for f in report.folds]
     mean_cas = report.mean_cost_adjusted_sharpe
     for i, f in enumerate(folds):
-        print(f"[{symbol}] fold {i}: "
-              f"sharpe={f['sharpe']:.2f} "
-              f"cas={f['cost_adjusted_sharpe']:.2f} "
-              f"mdd={f['max_drawdown_pct']:.2f}% "
-              f"hit={f['hit_rate']:.2%} "
-              f"n_fills={f['n_fills']} "
-              f"ret={f['total_return_pct']:.2f}%")
+        print(
+            f"[{symbol}] fold {i}: "
+            f"sharpe={f['sharpe']:.2f} "
+            f"cas={f['cost_adjusted_sharpe']:.2f} "
+            f"mdd={f['max_drawdown_pct']:.2f}% "
+            f"hit={f['hit_rate']:.2%} "
+            f"n_fills={f['n_fills']} "
+            f"ret={f['total_return_pct']:.2f}%"
+        )
     print(f"[{symbol}] mean cost-adjusted sharpe = {mean_cas:.3f}")
     return {
         "symbol": symbol,

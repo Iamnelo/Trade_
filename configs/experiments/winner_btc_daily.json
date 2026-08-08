@@ -1,0 +1,54 @@
+{
+  "name": "winner_btc_daily_v1",
+  "data": {
+    "csv_path": "BTCUSDT_D_5y.csv",
+    "symbol": "BTCUSDT",
+    "interval": "D"
+  },
+  "features": [
+    "log_return@5",
+    "realized_vol@20",
+    "atr@14",
+    "macd_hist@12_26_9",
+    "rsi_close@14"
+  ],
+  "label": {
+    "kind": "triple_barrier",
+    "horizon_bars": 5,
+    "up_pct": 0.05,
+    "down_pct": 0.05,
+    "mode": "3class"
+  },
+  "model": {
+    "n_estimators": 100,
+    "learning_rate": 0.05,
+    "num_leaves": 15,
+    "min_data_in_leaf": 5,
+    "max_depth": -1,
+    "calibration_fraction": 0.2
+  },
+  "strategy": {
+    "confidence_threshold": 0.55,
+    "notional_fraction": 0.5,
+    "allow_short": true
+  },
+  "wfo": {
+    "train_bars": 1095,
+    "test_bars": 180,
+    "step_bars": 180,
+    "expanding": false
+  },
+  "backtest": {
+    "initial_equity": 10000.0,
+    "fee_bps": 5.5,
+    "slippage_bps": 5.0,
+    "bars_per_year": 365
+  },
+  "gates": {
+    "max_fold_drawdown_pct": 15.0,
+    "min_pct_folds_positive_cas": 0.5,
+    "min_fills_per_fold": 0,
+    "min_folds_with_trades": 3,
+    "max_annualized_turnover": 50.0
+  }
+}
