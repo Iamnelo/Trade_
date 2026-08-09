@@ -127,8 +127,7 @@ def test_funding_zscore_zero_when_history_constant() -> None:
 def test_funding_zscore_positive_on_spike() -> None:
     t0 = datetime(2024, 1, 1, tzinfo=UTC)
     fundings = [
-        _funding("BTCUSDT", t0 + timedelta(hours=8 * i), 0.001 if i < 4 else 0.05)
-        for i in range(5)
+        _funding("BTCUSDT", t0 + timedelta(hours=8 * i), 0.001 if i < 4 else 0.05) for i in range(5)
     ]
     feat = FundingZScoreN(fundings, window=5)
     got = feat.compute([_bar("BTCUSDT", t0 + timedelta(hours=8 * 5))])

@@ -42,9 +42,7 @@ class BinaryModelDrivenStrategy:
         if not 0.0 < notional_fraction <= 1.0:
             raise ValueError("notional_fraction must be in (0.0, 1.0]")
         if not 0.5 < confidence_threshold <= 1.0:
-            raise ValueError(
-                "confidence_threshold must be in (0.5, 1.0] for a binary strategy"
-            )
+            raise ValueError("confidence_threshold must be in (0.5, 1.0] for a binary strategy")
         if not features:
             raise ValueError("at least one feature is required")
         expected_fids = tuple(f.spec.full_id for f in features)

@@ -110,8 +110,8 @@ class FundingRegime(_FundingBackedFeature):
         self,
         funding_records: Sequence[FundingRecord],
         *,
-        short_window: int = 9,   # ~3 days at 8h cadence
-        long_window: int = 63,   # ~3 weeks at 8h cadence
+        short_window: int = 9,  # ~3 days at 8h cadence
+        long_window: int = 63,  # ~3 weeks at 8h cadence
     ) -> None:
         if short_window < 2 or long_window < 2:
             raise ValueError("short_window and long_window must be >= 2")

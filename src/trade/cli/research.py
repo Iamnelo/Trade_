@@ -208,8 +208,7 @@ def sweep(
             f"{'PASS' if t.gate.passed else 'FAIL'}"
         )
     typer.echo(
-        f"\nwrote {out_dir}/{stem}.* (json, cells.csv, thresholds.csv, "
-        f"classifier.csv, md, html)"
+        f"\nwrote {out_dir}/{stem}.* (json, cells.csv, thresholds.csv, classifier.csv, md, html)"
     )
 
 
@@ -265,20 +264,37 @@ def matrix(
     # CSV: one row per cell with the primary ranking metrics.
     with (out_dir / f"{stem}.csv").open("w", newline="") as f:
         w = csv.writer(f)
-        w.writerow([
-            "cell_index", "name", "fingerprint", "passed",
-            "mean_cost_adjusted_sharpe", "consistency_score",
-            "pct_folds_positive_cas", "max_fold_drawdown_pct",
-            "annualized_turnover", "total_fills", "reasons_failed",
-        ])
+        w.writerow(
+            [
+                "cell_index",
+                "name",
+                "fingerprint",
+                "passed",
+                "mean_cost_adjusted_sharpe",
+                "consistency_score",
+                "pct_folds_positive_cas",
+                "max_fold_drawdown_pct",
+                "annualized_turnover",
+                "total_fills",
+                "reasons_failed",
+            ]
+        )
         for row in rank_matrix(report.rows):
-            w.writerow([
-                row.cell_index, row.name, row.fingerprint, row.passed,
-                row.mean_cost_adjusted_sharpe, row.consistency_score,
-                row.pct_folds_positive_cas, row.max_fold_drawdown_pct,
-                row.annualized_turnover, row.total_fills,
-                " ; ".join(row.reasons_failed),
-            ])
+            w.writerow(
+                [
+                    row.cell_index,
+                    row.name,
+                    row.fingerprint,
+                    row.passed,
+                    row.mean_cost_adjusted_sharpe,
+                    row.consistency_score,
+                    row.pct_folds_positive_cas,
+                    row.max_fold_drawdown_pct,
+                    row.annualized_turnover,
+                    row.total_fills,
+                    " ; ".join(row.reasons_failed),
+                ]
+            )
 
     (out_dir / f"{stem}.md").write_text(format_matrix_table(report))
     typer.echo("")

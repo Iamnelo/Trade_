@@ -1,0 +1,32 @@
+{
+  "artifact_kind": "3class",
+  "calibration_rows": 364,
+  "calibrator_present": true,
+  "feature_ids": [
+    "log_return@5",
+    "realized_vol@20",
+    "atr@14",
+    "macd_hist@12_26_9",
+    "rsi_close@14"
+  ],
+  "manifest_version": 1,
+  "model_config": {
+    "calibration_fraction": 0.2,
+    "model": {
+      "deterministic": true,
+      "force_row_wise": true,
+      "learning_rate": 0.05,
+      "max_depth": -1,
+      "min_data_in_leaf": 5,
+      "n_estimators": 100,
+      "num_class": 3,
+      "num_leaves": 15,
+      "objective": "multiclass",
+      "random_state": 42,
+      "verbose": -1
+    }
+  },
+  "reproducibility_hash": "85f468f6ead7a6b6b8d083bf615c7ef1a187a8d8e900a7ff6222583fac629cb2",
+  "saved_at": "2026-08-08T21:25:56.860854+00:00",
+  "train_rows": 1457
+}

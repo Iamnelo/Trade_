@@ -13,12 +13,18 @@ from trade.data.schemas import KlineRecord
 from trade.features.definitions.log_return import LogReturnN
 from trade.features.definitions.realized_vol import RealizedVolN
 from trade.features.store import InMemoryFeatureStore
-from trade.labels.triple_barrier import triple_barrier_labels
+from trade.labels.triple_barrier import (
+    triple_barrier_labels,
+    triple_barrier_labels_directional,
+)
 from trade.model.persistence import (
+    load_any_training_artifacts,
+    load_binary_training_artifacts,
     load_training_artifacts,
+    save_binary_training_artifacts,
     save_training_artifacts,
 )
-from trade.training.pipeline import train_model
+from trade.training.pipeline import train_model, train_model_binary
 
 
 def _bars(n: int, seed: int = 42) -> list[KlineRecord]:
@@ -106,6 +112,71 @@ def test_load_rejects_unknown_manifest_version(tmp_path: Path) -> None:
     (out_dir / "manifest.json").write_text(json.dumps({"manifest_version": 99}))
     with pytest.raises(ValueError, match="manifest_version"):
         load_training_artifacts(out_dir)
+
+
+def _train_binary() -> tuple:
+    bars = _bars(500, seed=7)
+    feats = [LogReturnN(window=5), RealizedVolN(window=20)]
+    store = InMemoryFeatureStore()
+    for feat in feats:
+        store.materialize(feature=feat, entity_id="BTCUSDT", bars=bars)
+    labels = triple_barrier_labels_directional(bars, horizon_bars=6, up_pct=0.01, down_pct=0.01)
+    artifacts = train_model_binary(
+        feature_store=store,
+        feature_ids=[f.spec.full_id for f in feats],
+        labels=labels,
+        dataset_manifest_ids=["ds1"],
+        feature_manifest_ids=[f.spec.full_id for f in feats],
+        code_git_sha="deadbeef",
+        python_lockfile_sha="cafef00d",
+    )
+    return artifacts, store, labels
+
+
+def test_binary_save_load_round_trip(tmp_path: Path) -> None:
+    artifacts, store, labels = _train_binary()
+    out_dir = tmp_path / "binary-v1"
+    save_binary_training_artifacts(artifacts, out_dir)
+
+    manifest = json.loads((out_dir / "manifest.json").read_text())
+    assert manifest["artifact_kind"] == "2class_directional"
+
+    loaded = load_binary_training_artifacts(out_dir)
+    assert loaded.feature_ids == artifacts.feature_ids
+    assert loaded.reproducibility_hash == artifacts.reproducibility_hash
+
+    frame = store.point_in_time_join(labels=labels, feature_ids=artifacts.feature_ids)
+    p_original = artifacts.model.predict_proba_matrix(frame)
+    p_loaded = loaded.model.predict_proba_matrix(frame)
+    assert np.array_equal(p_original, p_loaded)
+
+
+def test_load_any_dispatches_on_kind(tmp_path: Path) -> None:
+    three_class, _, _ = _train()
+    binary, _, _ = _train_binary()
+    d3 = tmp_path / "three"
+    db = tmp_path / "bin"
+    save_training_artifacts(three_class, d3)
+    save_binary_training_artifacts(binary, db)
+
+    assert type(load_any_training_artifacts(d3)).__name__ == "TrainingArtifacts"
+    assert type(load_any_training_artifacts(db)).__name__ == "BinaryTrainingArtifacts"
+
+
+def test_load_binary_rejects_three_class_artifact(tmp_path: Path) -> None:
+    three_class, _, _ = _train()
+    d3 = tmp_path / "three-only"
+    save_training_artifacts(three_class, d3)
+    with pytest.raises(ValueError, match="not '2class_directional'"):
+        load_binary_training_artifacts(d3)
+
+
+def test_load_three_class_rejects_binary_artifact(tmp_path: Path) -> None:
+    binary, _, _ = _train_binary()
+    db = tmp_path / "bin-only"
+    save_binary_training_artifacts(binary, db)
+    with pytest.raises(ValueError, match="not 3-class"):
+        load_training_artifacts(db)
 
 
 def test_save_without_calibrator_and_load_back(tmp_path: Path) -> None:

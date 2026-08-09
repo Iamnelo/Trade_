@@ -87,9 +87,16 @@ def triple_barrier_labels_directional(
     burning probability mass. Flat outcomes are still meaningful information
     at test time — but we don't ask a directional model to predict them.
     """
-    return [lb for lb in triple_barrier_labels(
-        bars, horizon_bars=horizon_bars, up_pct=up_pct, down_pct=down_pct,
-    ) if lb.label != 0.0]
+    return [
+        lb
+        for lb in triple_barrier_labels(
+            bars,
+            horizon_bars=horizon_bars,
+            up_pct=up_pct,
+            down_pct=down_pct,
+        )
+        if lb.label != 0.0
+    ]
 
 
 def vol_scaled_barriers(*, atr: float, entry_price: float, k: float = 1.5) -> tuple[float, float]:

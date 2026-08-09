@@ -301,5 +301,3 @@ def format_matrix_table(report: MatrixReport, *, top_n: int | None = None) -> st
             f"{row.annualized_turnover:>8.2f}"
         )
     return "\n".join(lines)
-
-

@@ -63,9 +63,7 @@ def _train_binary_model() -> tuple[LightGBMBinaryClassifierV1, list, list[KlineR
         )
         for i, b in enumerate(bars[50:250])
     ]
-    frame = store.point_in_time_join(
-        labels=label_rows, feature_ids=[f.spec.full_id for f in feats]
-    )
+    frame = store.point_in_time_join(labels=label_rows, feature_ids=[f.spec.full_id for f in feats])
     clf = LightGBMBinaryClassifierV1(params={"n_estimators": 20, "num_leaves": 3})
     clf.fit(frame=frame, feature_ids=[f.spec.full_id for f in feats])
     return clf, feats, bars
@@ -123,9 +121,7 @@ def test_binary_strategy_calibrator_composes() -> None:
         )
         for i, b in enumerate(bars[50:250])
     ]
-    frame = store.point_in_time_join(
-        labels=label_rows, feature_ids=[f.spec.full_id for f in feats]
-    )
+    frame = store.point_in_time_join(labels=label_rows, feature_ids=[f.spec.full_id for f in feats])
     raw = clf.predict_proba_matrix(frame)
     y = np.where(np.array(frame.labels) > 0, 1, 0).astype(np.int64)
     cal = IsotonicCalibrator()

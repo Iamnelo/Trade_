@@ -254,6 +254,35 @@ def _backtest_fold(
     )
 
 
+def backtest_trained_fold(
+    trained: TrainedFold,
+    *,
+    config: BacktestConfig,
+    bars_per_year: int,
+    confidence_threshold: float,
+    notional_fraction: float = 0.5,
+    allow_short: bool = True,
+    cost_bps_per_side: float = 5.5,
+) -> ModelFoldResult:
+    """Public entry to replay a strategy over an ALREADY-TRAINED fold.
+
+    This performs NO fitting — the caller supplies a `TrainedFold` (e.g.
+    reconstructed from frozen, on-disk artifacts) and this replays the
+    strategy over the fold's test window. It is the exact path the WFO
+    uses per fold, exposed so a forward-test harness can evaluate a frozen
+    model on out-of-sample bars without retraining.
+    """
+    return _backtest_fold(
+        trained,
+        config=config,
+        bars_per_year=bars_per_year,
+        confidence_threshold=confidence_threshold,
+        notional_fraction=notional_fraction,
+        allow_short=allow_short,
+        cost_bps_per_side=cost_bps_per_side,
+    )
+
+
 def run_walk_forward_model(
     *,
     bars: Sequence[KlineRecord],

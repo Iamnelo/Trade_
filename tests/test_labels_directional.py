@@ -11,8 +11,9 @@ from trade.labels.triple_barrier import (
 )
 
 
-def _bars(closes: list[float], highs: list[float] | None = None,
-          lows: list[float] | None = None) -> list[KlineRecord]:
+def _bars(
+    closes: list[float], highs: list[float] | None = None, lows: list[float] | None = None
+) -> list[KlineRecord]:
     if highs is None:
         highs = closes
     if lows is None:

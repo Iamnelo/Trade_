@@ -6,14 +6,14 @@ Outputs BTCUSDT_funding_5y.csv and ETHUSDT_funding_5y.csv in the current directo
 Range: 2021-08-08T00:00:00Z (inclusive) .. 2026-08-08T00:00:00Z (exclusive)
 No third-party deps (uses urllib). Run:  python fetch_funding.py
 """
+
 import urllib.request, json, time, csv, datetime
 
 BASE = "https://api.bybit.com/v5/market/funding/history"
 
 
 def iso_to_ms(s: str) -> int:
-    dt = datetime.datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ").replace(
-        tzinfo=datetime.timezone.utc)
+    dt = datetime.datetime.strptime(s, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=datetime.timezone.utc)
     return int(dt.timestamp() * 1000)
 
 
@@ -25,8 +25,10 @@ def fetch(symbol: str) -> dict:
     rows = {}  # timestamp -> funding_rate
     cur_end = END_MS - 1
     while cur_end >= START_MS:
-        url = (f"{BASE}?category=linear&symbol={symbol}"
-               f"&limit=200&startTime={START_MS}&endTime={cur_end}")
+        url = (
+            f"{BASE}?category=linear&symbol={symbol}"
+            f"&limit=200&startTime={START_MS}&endTime={cur_end}"
+        )
         for attempt in range(5):
             try:
                 with urllib.request.urlopen(url, timeout=30) as r:
@@ -37,8 +39,7 @@ def fetch(symbol: str) -> dict:
                     raise
                 time.sleep(2)
         if data.get("retCode") != 0:
-            raise SystemExit(f"API error {symbol}: "
-                             f"{data.get('retCode')} {data.get('retMsg')}")
+            raise SystemExit(f"API error {symbol}: {data.get('retCode')} {data.get('retMsg')}")
         lst = data["result"]["list"]
         if not lst:
             break
@@ -63,6 +64,7 @@ def sanity(path: str, ts_sorted: list, rates: dict):
         assert v == v, f"{path}: NaN funding_rate"  # NaN != NaN
     diffs = [b - a for a, b in zip(ts_sorted, ts_sorted[1:])]
     from collections import Counter
+
     common = Counter(diffs).most_common(3)
     print(f"  {path}: {len(ts_sorted)} rows, no dupes, no NaN")
     print(f"    spacing (ms) most common: {common}")
