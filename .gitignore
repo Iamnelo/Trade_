@@ -58,3 +58,6 @@ env/
 
 # Docker volumes
 ops/data/
+
+# Phase 4c paper-trading runtime output
+paper_journal/
