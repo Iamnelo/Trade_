@@ -43,6 +43,7 @@ class SymbolDecision:
     meets_threshold: bool
     direction: str  # "long" | "short" | "flat"
     target_qty: float | None
+    reason: str
 
 
 class PaperSymbolBundle:
@@ -172,6 +173,7 @@ class PaperSymbolBundle:
                 meets_threshold=False,
                 direction="flat",
                 target_qty=None,
+                reason="insufficient history for at least one feature (warmup)",
             )
         probs = self._probs(fv)
         chosen, direction, conf, meets = self._direction(probs)
@@ -188,4 +190,27 @@ class PaperSymbolBundle:
             meets_threshold=meets,
             direction=direction,
             target_qty=target_qty,
+            reason=self._reason(chosen, direction, conf, meets, probs),
         )
+
+    def _reason(
+        self,
+        chosen: str,
+        direction: str,
+        conf: float,
+        meets: bool,
+        probs: dict[str, float],
+    ) -> str:
+        thr = self.threshold
+        if self.label_mode == "3class":
+            rel = "≥" if meets else "<"
+            base = f"argmax={chosen} p={conf:.3f} {rel} θ={thr:.2f}"
+            if direction == "flat" and chosen == "down" and not self._allow_short:
+                return f"{base}; short disabled → FLAT"
+            return f"{base} → {direction.upper()}"
+        p_up = probs["up"]
+        if direction == "long":
+            return f"P(up)={p_up:.3f} > θ={thr:.2f} → LONG"
+        if direction == "short":
+            return f"P(up)={p_up:.3f} < 1-θ={1 - thr:.2f} → SHORT"
+        return f"P(up)={p_up:.3f} within [{1 - thr:.2f}, {thr:.2f}] → FLAT"

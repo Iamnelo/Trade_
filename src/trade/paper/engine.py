@@ -39,12 +39,13 @@ from trade.mre.clock import SimClock
 from trade.mre.oms import OrderManager
 from trade.mre.risk import RiskManager
 from trade.mre.source import MarketReplaySource
-from trade.mre.types import Fill, TargetPosition
+from trade.mre.types import Fill, Order, Side, TargetPosition
 from trade.mre.venue import SimulatedVenue
 from trade.paper.config import PaperTradingConfig
 from trade.paper.journal import PaperJournal
 from trade.paper.notifier import Notifier, NullNotifier
 from trade.paper.predictor import PaperSymbolBundle, SymbolDecision
+from trade.paper.report import build_report, load_events, render_markdown, render_telegram
 from trade.runtime.kill_switch import KillSwitchController, check_data_staleness
 from trade.utils.clock import utcnow
 
@@ -78,6 +79,8 @@ class PaperTradingEngine:
         bundles: Sequence[PaperSymbolBundle],
         journal: PaperJournal,
         notifier: Notifier | None = None,
+        reports_dir: Path | None = None,
+        state_path: Path | None = None,
     ) -> None:
         if not bundles:
             raise ValueError("at least one bundle is required")
@@ -104,11 +107,22 @@ class PaperTradingEngine:
 
         self._assert_paper_only()
 
+        self._reports_dir = reports_dir or (config.journal_dir / "reports")
+        self._state_path = state_path or (config.journal_dir / "state.json")
+
         self._buffers: dict[str, list[KlineRecord]] = {s: [] for s in self._bundles}
         self._latest_close: dict[str, float] = {}
         self._n_decisions = 0
         self._n_fills = 0
         self._last_bar_time: datetime | None = None
+        # Signed cost basis per symbol for per-trade realized P&L: (qty, avg_price).
+        self._cost_basis: dict[str, tuple[float, float]] = {}
+        self._realized_pnl = 0.0
+        # Close-time of the previously processed group; a change of UTC day / ISO
+        # week versus the incoming group triggers a report for the completed one.
+        self._prev_close_time: datetime | None = None
+
+        self._restore_state()
 
     # -- safety ----------------------------------------------------------
 
@@ -206,6 +220,11 @@ class PaperTradingEngine:
             decision = bundle.decide(source=source, bar=bar, snapshot=snapshot)
             self._handle_decision(bundle, decision, submit_time=close_time)
 
+        # 4. period-boundary reports + durable state snapshot.
+        self._maybe_emit_reports(close_time)
+        self._prev_close_time = close_time
+        self._snapshot_state()
+
     # -- helpers ---------------------------------------------------------
 
     def _build_source(self, now: datetime) -> MarketReplaySource:
@@ -247,6 +266,7 @@ class PaperTradingEngine:
             "target_qty": decision.target_qty,
             "probs": decision.probs,
             "threshold": bundle.threshold,
+            "reason": decision.reason,
             "execution_enabled": self.armed,
             "halted": halted,
         }
@@ -283,6 +303,11 @@ class PaperTradingEngine:
 
     def _settle_fill(self, fill: Fill) -> None:
         prev_qty = self._oms.position_qty(fill.symbol)
+        signed = fill.quantity if fill.side is Side.BUY else -fill.quantity
+        realized = self._update_cost_basis(fill.symbol, signed_delta=signed, price=fill.price)
+        realized -= fill.fee  # net of the fee paid on this fill
+        self._realized_pnl += realized
+
         self._oms.apply_fill(fill)
         new_qty = self._oms.position_qty(fill.symbol)
         self._n_fills += 1
@@ -308,16 +333,46 @@ class PaperTradingEngine:
                 "fee": fill.fee,
                 "prev_qty": prev_qty,
                 "new_qty": new_qty,
+                "realized_pnl": realized,
+                "cumulative_realized_pnl": self._realized_pnl,
                 "equity": equity,
             },
         )
         icon = {"OPEN": "🟢", "EXIT": "🔴", "REVERSE": "🔁", "SCALE": "⚖️"}[kind]
         ret_pct = (equity / self._config.initial_equity - 1.0) * 100
+        pnl_line = ""
+        if kind in ("EXIT", "REVERSE"):
+            pnl_line = f" pnl={realized:+.2f}"
         self._notify(
             f"{icon} {kind} {fill.symbol} {fill.side.value} "
-            f"{fill.quantity:.6f} @ {fill.price:.2f}\n"
+            f"{fill.quantity:.6f} @ {fill.price:.2f}{pnl_line}\n"
             f"pos={new_qty:+.6f} equity={equity:.2f} ({ret_pct:+.2f}%)"
         )
+
+    def _update_cost_basis(self, symbol: str, *, signed_delta: float, price: float) -> float:
+        """Update the signed cost basis and return realized P&L (price-based).
+
+        Standard average-cost accounting: adding in the same direction updates
+        the average entry; reducing/closing realizes P&L against it; a reverse
+        closes the old side and opens the new at `price`.
+        """
+        qty, avg = self._cost_basis.get(symbol, (0.0, 0.0))
+        new_qty = qty + signed_delta
+        realized = 0.0
+        if abs(qty) < 1e-12 or (qty > 0) == (signed_delta > 0):
+            # Opening or scaling in the same direction.
+            total = abs(qty) + abs(signed_delta)
+            avg = (abs(qty) * avg + abs(signed_delta) * price) / total if total else price
+        else:
+            # Reducing, closing, or reversing.
+            closed = min(abs(qty), abs(signed_delta))
+            realized = closed * (price - avg) * (1.0 if qty > 0 else -1.0)
+            if abs(signed_delta) > abs(qty):
+                avg = price  # reversed onto the new side
+            elif abs(new_qty) < 1e-12:
+                avg = 0.0
+        self._cost_basis[symbol] = (new_qty, avg)
+        return realized
 
     def check_staleness(self, *, now: datetime | None = None) -> None:
         """Trip the kill switch if confirmed bars have stopped arriving."""
@@ -346,6 +401,160 @@ class PaperTradingEngine:
         # bug in a custom notifier cannot break the trading loop.
         with contextlib.suppress(Exception):
             self._notifier.notify(text)
+
+    # -- reports ---------------------------------------------------------
+
+    def _maybe_emit_reports(self, close_time: datetime) -> None:
+        prev = self._prev_close_time
+        if prev is None:
+            return
+        if close_time.date() != prev.date():
+            self._emit_report("daily", as_of=prev)
+        if close_time.isocalendar()[:2] != prev.isocalendar()[:2]:
+            self._emit_report("weekly", as_of=prev)
+
+    def _emit_report(self, period: str, *, as_of: datetime) -> None:
+        report = build_report(
+            journal_dir=self._config.journal_dir,
+            period=period,
+            as_of=as_of,
+            initial_equity=self._config.initial_equity,
+        )
+        self._reports_dir.mkdir(parents=True, exist_ok=True)
+        (self._reports_dir / f"{period}_{report.window_label}.md").write_text(
+            render_markdown(report), encoding="utf-8"
+        )
+        self._journal.record("report", {"period": period, "window": report.window_label})
+        self._notify(render_telegram(report))
+
+    def emit_report_now(self, period: str, *, as_of: datetime | None = None) -> str:
+        """Generate a report on demand and return its markdown (also written)."""
+        at = as_of or (self._prev_close_time or utcnow())
+        report = build_report(
+            journal_dir=self._config.journal_dir,
+            period=period,
+            as_of=at,
+            initial_equity=self._config.initial_equity,
+        )
+        self._reports_dir.mkdir(parents=True, exist_ok=True)
+        md = render_markdown(report)
+        (self._reports_dir / f"{period}_{report.window_label}.md").write_text(md, encoding="utf-8")
+        return md
+
+    # -- durable state ---------------------------------------------------
+
+    def _snapshot_state(self) -> None:
+        keep = {s: b.max_lookback + 5 for s, b in self._bundles.items()}
+        buffers = {
+            s: [self._bar_to_dict(bar) for bar in self._buffers[s][-keep[s] :]]
+            for s in self._bundles
+        }
+        state = {
+            "last_bar_time": self._last_bar_time.isoformat() if self._last_bar_time else None,
+            "prev_close_time": (
+                self._prev_close_time.isoformat() if self._prev_close_time else None
+            ),
+            "latest_close": self._latest_close,
+            "pending_orders": [self._order_to_dict(o) for o in self._venue.pending],
+            "buffers": buffers,
+        }
+        self._state_path.parent.mkdir(parents=True, exist_ok=True)
+        self._state_path.write_text(json.dumps(state, default=str), encoding="utf-8")
+
+    def _restore_state(self) -> None:
+        # Rebuild trading state from the journal (the tamper-evident source of
+        # truth), so a restart resumes exactly where it left off.
+        for ev in load_events(self._config.journal_dir):
+            kind = ev.get("kind")
+            if kind == "fill":
+                fill = self._fill_from_record(ev)
+                signed = fill.quantity if fill.side is Side.BUY else -fill.quantity
+                realized = self._update_cost_basis(
+                    fill.symbol, signed_delta=signed, price=fill.price
+                )
+                self._realized_pnl += realized - fill.fee
+                self._oms.apply_fill(fill)
+                self._n_fills += 1
+            elif kind == "decision":
+                self._n_decisions += 1
+
+        if not self._state_path.exists():
+            return
+        state = json.loads(self._state_path.read_text(encoding="utf-8"))
+        self._latest_close = {k: float(v) for k, v in state.get("latest_close", {}).items()}
+        if state.get("last_bar_time"):
+            self._last_bar_time = datetime.fromisoformat(state["last_bar_time"])
+        if state.get("prev_close_time"):
+            self._prev_close_time = datetime.fromisoformat(state["prev_close_time"])
+        for sym, bars in state.get("buffers", {}).items():
+            if sym in self._buffers:
+                self._buffers[sym] = [self._bar_from_dict(b) for b in bars]
+        pending = [self._order_from_dict(o) for o in state.get("pending_orders", [])]
+        if pending:
+            self._venue.submit(pending)
+
+    @staticmethod
+    def _bar_to_dict(bar: KlineRecord) -> dict[str, Any]:
+        return {
+            "symbol": bar.symbol,
+            "interval": bar.interval,
+            "event_time": bar.event_time.isoformat(),
+            "open": bar.open,
+            "high": bar.high,
+            "low": bar.low,
+            "close": bar.close,
+            "volume": bar.volume,
+            "turnover": bar.turnover,
+        }
+
+    def _bar_from_dict(self, d: dict[str, Any]) -> KlineRecord:
+        return KlineRecord(
+            source="restored",
+            category="linear",
+            symbol=d["symbol"],
+            interval=d["interval"],
+            event_time=datetime.fromisoformat(d["event_time"]),
+            ingest_time=datetime.fromisoformat(d["event_time"]),
+            open=float(d["open"]),
+            high=float(d["high"]),
+            low=float(d["low"]),
+            close=float(d["close"]),
+            volume=float(d["volume"]),
+            turnover=float(d["turnover"]),
+        )
+
+    @staticmethod
+    def _order_to_dict(order: Order) -> dict[str, Any]:
+        return {
+            "client_order_id": order.client_order_id,
+            "symbol": order.symbol,
+            "side": order.side.value,
+            "quantity": order.quantity,
+            "submit_time": order.submit_time.isoformat(),
+        }
+
+    @staticmethod
+    def _order_from_dict(d: dict[str, Any]) -> Order:
+        return Order(
+            client_order_id=d["client_order_id"],
+            symbol=d["symbol"],
+            side=Side(d["side"]),
+            quantity=float(d["quantity"]),
+            submit_time=datetime.fromisoformat(d["submit_time"]),
+        )
+
+    @staticmethod
+    def _fill_from_record(ev: dict[str, Any]) -> Fill:
+        ts = datetime.fromisoformat(ev["timestamp"])
+        return Fill(
+            client_order_id=str(ev.get("client_order_id", "")),
+            symbol=str(ev["symbol"]),
+            side=Side(str(ev["side"])),
+            quantity=float(ev["quantity"]),
+            price=float(ev["price"]),
+            fee=float(ev.get("fee", 0.0)),
+            event_time=ts,
+        )
 
     # -- introspection ---------------------------------------------------
 

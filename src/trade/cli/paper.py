@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 
 import typer
@@ -25,6 +26,7 @@ from trade.paper.engine import PaperTradingEngine, load_bundles
 from trade.paper.feed import ReplayFeed
 from trade.paper.journal import PaperJournal
 from trade.paper.notifier import build_notifier
+from trade.paper.report import build_report, render_markdown
 from trade.research.runner import load_klines_csv
 
 paper_app = typer.Typer(no_args_is_help=True)
@@ -149,3 +151,24 @@ def verify(
 ) -> None:
     PaperJournal(journal_dir).verify()
     typer.echo("audit chain: OK")
+
+
+@paper_app.command("report")
+def report(
+    period: str = typer.Option("daily", "--period", help="daily | weekly"),
+    journal_dir: Path = typer.Option(_REPO_ROOT / "paper_journal", "--journal-dir"),
+    initial_equity: float = typer.Option(10_000.0, "--initial-equity"),
+    as_of: str = typer.Option(None, "--as-of", help="ISO datetime; default = now (UTC)."),
+    out: Path = typer.Option(None, "--out", help="Write markdown here instead of stdout."),
+) -> None:
+    when = datetime.fromisoformat(as_of) if as_of else datetime.now(tz=UTC)
+    rpt = build_report(
+        journal_dir=journal_dir, period=period, as_of=when, initial_equity=initial_equity
+    )
+    md = render_markdown(rpt)
+    if out:
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(md, encoding="utf-8")
+        typer.echo(f"wrote {out}")
+    else:
+        typer.echo(md)
