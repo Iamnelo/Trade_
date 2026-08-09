@@ -167,8 +167,12 @@ def test_backtest_run_model_driven_requires_model_path(tmp_path: Path) -> None:
             str(tmp_path / "data"),
         ],
     )
-    assert result.exit_code != 0
-    assert "model-path" in result.output.lower() or "model_path" in result.output.lower()
+    # Must be rejected: model_driven with no --model-path cannot run. We assert
+    # on the exit code, not the error wording — newer Click/Typer route the
+    # usage-error text to stderr (separate from result.output), so matching on
+    # the option name in .output is brittle across framework versions. A Click
+    # usage error (missing required option) exits with code 2.
+    assert result.exit_code == 2
 
 
 def test_benchmark_suite_with_model_includes_model_row(tmp_path: Path) -> None:
