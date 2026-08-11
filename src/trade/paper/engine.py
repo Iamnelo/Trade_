@@ -121,6 +121,12 @@ class PaperTradingEngine:
         # Close-time of the previously processed group; a change of UTC day / ISO
         # week versus the incoming group triggers a report for the completed one.
         self._prev_close_time: datetime | None = None
+        # Most recent decision per symbol, used to enrich fill notifications with
+        # the model direction/confidence that triggered the order (the order is
+        # queued at bar close and fills at the next bar's open).
+        self._last_decision: dict[str, SymbolDecision] = {}
+        # Latch so "feed connected" is notified once per run, not per bar.
+        self._feed_connected = False
 
         self._restore_state()
 
@@ -165,14 +171,36 @@ class PaperTradingEngine:
             f"🛑 Paper trading STOP — equity={st.equity:.2f} "
             f"({st.total_return_pct:+.2f}%) fills={st.n_fills}"
         )
+        # Give a background notifier a moment to drain the shutdown messages.
+        flush = getattr(self._notifier, "flush", None)
+        if callable(flush):
+            with contextlib.suppress(Exception):
+                flush()
 
     async def run(self, feed: AsyncIterable[list[KlineRecord]]) -> None:
         self.start()
         try:
             async for batch in feed:
+                if not self._feed_connected:
+                    self._feed_connected = True
+                    self._journal.record("feed_connected", {"symbols": sorted(self._bundles)})
+                    self._notify("📡 Data feed CONNECTED — first bars received")
                 self.process_batch(batch)
+        except Exception as exc:
+            self._journal.record("engine_crash", {"error": str(exc), "type": type(exc).__name__})
+            self._notify(f"🔥 Paper trading CRASHED — {type(exc).__name__}: {exc}")
+            raise
         finally:
             self.stop()
+
+    def on_ws_reconnect(self) -> None:
+        """Hook for the live WS client to report a reconnect (wired by the CLI).
+
+        No trade state is touched — Bybit resends only new confirmed bars after
+        a reconnect, so there is no risk of duplicate fills or notifications.
+        """
+        self._journal.record("ws_reconnect", {})
+        self._notify("📡 WebSocket RECONNECTED — resubscribing to kline stream")
 
     # -- core loop -------------------------------------------------------
 
@@ -244,6 +272,7 @@ class PaperTradingEngine:
             if reason in self._kill.active_reasons and reason not in self._risk.halted_reasons:
                 self._kill.clear(reason)
                 self._journal.record("halt_cleared", {"reason": reason})
+                self._notify(f"✅ HALT CLEARED: {reason} — new positions allowed again")
 
     def _handle_decision(
         self,
@@ -253,6 +282,8 @@ class PaperTradingEngine:
         submit_time: datetime,
     ) -> None:
         self._n_decisions += 1
+        if decision.status == "decided":
+            self._last_decision[decision.symbol] = decision
         halted = self._kill.is_halted or self._risk.is_halted
         record: dict[str, Any] = {
             "symbol": decision.symbol,
@@ -303,10 +334,16 @@ class PaperTradingEngine:
 
     def _settle_fill(self, fill: Fill) -> None:
         prev_qty = self._oms.position_qty(fill.symbol)
+        # Entry price of the position being modified (avg cost basis BEFORE this
+        # fill) — used to show entry vs exit in the notification.
+        _, entry_price = self._cost_basis.get(fill.symbol, (0.0, 0.0))
         signed = fill.quantity if fill.side is Side.BUY else -fill.quantity
         realized = self._update_cost_basis(fill.symbol, signed_delta=signed, price=fill.price)
         realized -= fill.fee  # net of the fee paid on this fill
         self._realized_pnl += realized
+        # Resulting average entry of the (possibly new) position — the sensible
+        # "entry" to show for an OPEN/SCALE.
+        _, post_entry = self._cost_basis.get(fill.symbol, (0.0, 0.0))
 
         self._oms.apply_fill(fill)
         new_qty = self._oms.position_qty(fill.symbol)
@@ -338,16 +375,67 @@ class PaperTradingEngine:
                 "equity": equity,
             },
         )
+        self._notify(
+            self._fill_message(
+                fill=fill,
+                kind=kind,
+                prev_qty=prev_qty,
+                new_qty=new_qty,
+                entry_price=entry_price,
+                post_entry=post_entry,
+                realized=realized,
+                equity=equity,
+            )
+        )
+
+    def _fill_message(
+        self,
+        *,
+        fill: Fill,
+        kind: str,
+        prev_qty: float,
+        new_qty: float,
+        entry_price: float,
+        post_entry: float,
+        realized: float,
+        equity: float,
+    ) -> str:
+        """Compose a rich fill notification from existing engine state.
+
+        Reuses the same information written to the journal fill record — no
+        parallel trade-state tracking. OPEN/SCALE show the position direction
+        and the model confidence that triggered it; EXIT/REVERSE add entry vs
+        exit price and realized P&L.
+        """
         icon = {"OPEN": "🟢", "EXIT": "🔴", "REVERSE": "🔁", "SCALE": "⚖️"}[kind]
         ret_pct = (equity / self._config.initial_equity - 1.0) * 100
-        pnl_line = ""
-        if kind in ("EXIT", "REVERSE"):
-            pnl_line = f" pnl={realized:+.2f}"
-        self._notify(
-            f"{icon} {kind} {fill.symbol} {fill.side.value} "
-            f"{fill.quantity:.6f} @ {fill.price:.2f}{pnl_line}\n"
-            f"pos={new_qty:+.6f} equity={equity:.2f} ({ret_pct:+.2f}%)"
+        ts = fill.event_time.isoformat()
+        # Direction: OPEN/SCALE describe the resulting position; EXIT/REVERSE
+        # describe the position that was closed.
+        ref_qty = prev_qty if kind in ("EXIT", "REVERSE") else new_qty
+        direction = "LONG" if ref_qty > 0 else "SHORT" if ref_qty < 0 else "FLAT"
+        dec = self._last_decision.get(fill.symbol)
+        conf = (
+            f" conf={dec.confidence:.3f}" if dec is not None and dec.confidence is not None else ""
         )
+
+        head = (
+            f"{icon} {kind} {direction} {fill.symbol} "
+            f"{fill.side.value} {fill.quantity:.6f} @ {fill.price:.2f}"
+        )
+        if kind in ("EXIT", "REVERSE"):
+            body = (
+                f"entry={entry_price:.2f} exit={fill.price:.2f} "
+                f"pnl={realized:+.2f} fee={fill.fee:.4f}\n"
+                f"cum_pnl={self._realized_pnl:+.2f} pos={new_qty:+.6f} "
+                f"equity={equity:.2f} ({ret_pct:+.2f}%)\n{ts}"
+            )
+        else:  # OPEN / SCALE
+            body = (
+                f"entry≈{post_entry:.2f}{conf} fee={fill.fee:.4f}\n"
+                f"pos={new_qty:+.6f} equity={equity:.2f} ({ret_pct:+.2f}%)\n{ts}"
+            )
+        return f"{head}\n{body}"
 
     def _update_cost_basis(self, symbol: str, *, signed_delta: float, price: float) -> float:
         """Update the signed cost basis and return realized P&L (price-based).

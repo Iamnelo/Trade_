@@ -1,0 +1,32 @@
+# Reference systemd unit for the ARMED (simulated) paper-trading loop.
+# Copy to /etc/systemd/system/trade-paper.service and adjust User/paths.
+#
+# STRICTLY SIMULATED: --arm-execution enables SIMULATED execution only; the
+# engine has no code path to a real or testnet venue. No exchange API keys are
+# used or needed here.
+#
+# The critical line for notifications is EnvironmentFile= — without it, the
+# TRADE_TELEGRAM_* vars are absent and notifications silently no-op.
+
+[Unit]
+Description=Trade paper-trading bot (simulated, armed)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=trade
+WorkingDirectory=/opt/trade
+# Provides TRADE_TELEGRAM_BOT_TOKEN / TRADE_TELEGRAM_CHAT_ID (and log settings).
+EnvironmentFile=/etc/trade-paper.env
+ExecStart=/usr/bin/env uv run python -m trade.cli paper run \
+    --arm-execution --confirm "ARM PAPER EXECUTION" \
+    --journal-dir /opt/trade/paper_journal
+Restart=on-failure
+RestartSec=5
+# The bot notifies "CRASHED" before exiting on an unhandled error; systemd then
+# restarts it. On restart the engine rebuilds state from the journal (no
+# duplicate trade notifications for already-recorded fills).
+
+[Install]
+WantedBy=multi-user.target

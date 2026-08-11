@@ -25,7 +25,12 @@ from trade.paper.config import PaperTradingConfig, TelegramConfig
 from trade.paper.engine import PaperTradingEngine, load_bundles
 from trade.paper.feed import ReplayFeed
 from trade.paper.journal import PaperJournal
-from trade.paper.notifier import build_notifier
+from trade.paper.notifier import (
+    BackgroundNotifier,
+    TelegramNotifier,
+    build_notifier,
+    log_notifier_status,
+)
 from trade.paper.report import build_report, render_markdown
 from trade.research.runner import load_klines_csv
 
@@ -95,25 +100,41 @@ def run(
 
     bundles = load_bundles(config, repo_root=_REPO_ROOT)
     journal = PaperJournal(config.journal_dir)
-    notifier = build_notifier(config.telegram)
+    # Log a clear signal about whether Telegram will actually deliver, then wrap
+    # the notifier so sends happen off the trading loop (non-blocking, non-fatal).
+    log_notifier_status(build_notifier(config.telegram), config.telegram)
+    if config.telegram.is_configured:
+        typer.echo("telegram: configured (notifications enabled)")
+    else:
+        typer.echo(
+            "telegram: NOT configured — set TRADE_TELEGRAM_BOT_TOKEN and "
+            "TRADE_TELEGRAM_CHAT_ID (notifications disabled)"
+        )
+    notifier = BackgroundNotifier(build_notifier(config.telegram))
     engine = PaperTradingEngine(config=config, bundles=bundles, journal=journal, notifier=notifier)
 
     interval = bundles[0].interval
-    if replay_csv:
-        bars = []
-        for csv_path, bundle in zip(replay_csv, bundles, strict=False):
-            bars.extend(load_klines_csv(csv_path, symbol=bundle.symbol, interval=bundle.interval))
-        typer.echo(f"replay: {len(bars)} bars across {len(replay_csv)} file(s)")
-        asyncio.run(engine.run(ReplayFeed(bars)))
-    else:
-        stream = BybitKlineStream(
-            url=ws_url,
-            symbols=list(chosen),
-            intervals=[interval],
-            max_reconnects=max_reconnects,
-        )
-        typer.echo(f"connecting live WS {ws_url} topics={stream.topics()}")
-        asyncio.run(engine.run(stream))
+    try:
+        if replay_csv:
+            bars = []
+            for csv_path, bundle in zip(replay_csv, bundles, strict=False):
+                bars.extend(
+                    load_klines_csv(csv_path, symbol=bundle.symbol, interval=bundle.interval)
+                )
+            typer.echo(f"replay: {len(bars)} bars across {len(replay_csv)} file(s)")
+            asyncio.run(engine.run(ReplayFeed(bars)))
+        else:
+            stream = BybitKlineStream(
+                url=ws_url,
+                symbols=list(chosen),
+                intervals=[interval],
+                max_reconnects=max_reconnects,
+                on_reconnect=engine.on_ws_reconnect,
+            )
+            typer.echo(f"connecting live WS {ws_url} topics={stream.topics()}")
+            asyncio.run(engine.run(stream))
+    finally:
+        notifier.close()
 
     st = engine.state()
     typer.echo(
@@ -151,6 +172,38 @@ def verify(
 ) -> None:
     PaperJournal(journal_dir).verify()
     typer.echo("audit chain: OK")
+
+
+@paper_app.command("test-telegram")
+def test_telegram(
+    message: str = typer.Option(
+        "✅ Paper-trading Telegram test — if you can read this, notifications work.",
+        "--message",
+    ),
+) -> None:
+    """Send a single test message using the configured env vars.
+
+    Safe: sends only a Telegram message, never touches trading or any venue.
+    Reads TRADE_TELEGRAM_BOT_TOKEN / TRADE_TELEGRAM_CHAT_ID from the environment.
+    """
+    cfg = TelegramConfig.from_env()
+    if not cfg.is_configured:
+        typer.echo(
+            "telegram NOT configured. Set TRADE_TELEGRAM_BOT_TOKEN and "
+            "TRADE_TELEGRAM_CHAT_ID in the environment, then retry."
+        )
+        raise typer.Exit(code=1)
+    notifier = TelegramNotifier(cfg)
+    ok = notifier.notify(message)
+    if ok:
+        typer.echo("sent OK — check your Telegram chat.")
+    else:
+        typer.echo(
+            f"send FAILED (sent={notifier.sent} failed={notifier.failed}). "
+            "See the logged warning above for the Telegram error detail "
+            "(bad token, wrong chat_id, or bot not started by the chat)."
+        )
+        raise typer.Exit(code=2)
 
 
 @paper_app.command("report")
