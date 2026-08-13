@@ -202,6 +202,49 @@ class PaperTradingEngine:
         self._journal.record("ws_reconnect", {})
         self._notify("📡 WebSocket RECONNECTED — resubscribing to kline stream")
 
+    def seed_history(self, bars: Sequence[KlineRecord]) -> dict[str, int]:
+        """Populate the feature-history buffers with pre-fetched closed candles.
+
+        This provides the genuine historical context each feature needs (up to
+        121 daily bars for the ETH winner) so the FIRST live confirmed bar can
+        produce a real decision instead of WARMUP. It only fills buffers — it
+        runs NO decisions, fills, or trade notifications; the seeded bars are
+        warmup context, not new events.
+
+        Idempotent and restart-safe: a symbol whose buffer already holds
+        >= max_lookback bars is skipped (so a restart does not refetch). Bars
+        are deduplicated by event_time with any already-present (live) bar
+        taking precedence over a seeded one, then sorted ascending. Returns the
+        number of bars added per symbol.
+        """
+        by_symbol: dict[str, list[KlineRecord]] = {}
+        for b in bars:
+            if b.symbol in self._bundles and b.interval == self._interval:
+                by_symbol.setdefault(b.symbol, []).append(b)
+
+        seeded: dict[str, int] = {}
+        for sym, bundle in self._bundles.items():
+            existing = self._buffers[sym]
+            if len(existing) >= bundle.max_lookback:
+                seeded[sym] = 0  # already have enough history; skip (restart-safe)
+                continue
+            incoming = by_symbol.get(sym, [])
+            if not incoming:
+                seeded[sym] = 0
+                continue
+            merged = {b.event_time: b for b in incoming}
+            for b in existing:  # live bars win over seeded ones on a tie
+                merged[b.event_time] = b
+            ordered = sorted(merged.values(), key=lambda b: b.event_time)
+            seeded[sym] = max(0, len(ordered) - len(existing))
+            self._buffers[sym] = ordered
+            self._latest_close[sym] = ordered[-1].close
+
+        total = sum(seeded.values())
+        if total:
+            self._journal.record("history_seeded", {"seeded": seeded, "total": total})
+        return seeded
+
     # -- core loop -------------------------------------------------------
 
     def process_batch(self, batch: Sequence[KlineRecord]) -> None:

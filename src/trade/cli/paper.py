@@ -20,7 +20,9 @@ from pathlib import Path
 
 import typer
 
+from trade.config import get_settings
 from trade.data.stream.bybit_ws import BybitKlineStream
+from trade.paper.bootstrap import fetch_seed_bars
 from trade.paper.config import PaperTradingConfig, TelegramConfig
 from trade.paper.engine import PaperTradingEngine, load_bundles
 from trade.paper.feed import ReplayFeed
@@ -49,6 +51,28 @@ def _resolve_execution(arm_execution: bool, confirm: str | None) -> bool:
             "exactly. Refusing to arm."
         )
     return True
+
+
+def _bootstrap_live_history(
+    *, engine: PaperTradingEngine, symbols: list[str], interval: str, n_bars: int
+) -> None:
+    """Seed feature history on the live feed from Bybit public REST.
+
+    Reuses the public backfill stack (no API keys, no order/testnet endpoints).
+    On failure it logs and continues — the bot still runs, just warming up from
+    live bars — so a transient REST hiccup never blocks startup.
+    """
+    base_url = get_settings().bybit_base_url
+    typer.echo(f"bootstrap: fetching {n_bars} closed {interval} candles for {symbols} …")
+    try:
+        bars = asyncio.run(
+            fetch_seed_bars(symbols=symbols, interval=interval, n_bars=n_bars, base_url=base_url)
+        )
+    except Exception as exc:
+        typer.echo(f"bootstrap FAILED ({type(exc).__name__}: {exc}); warming up from live bars")
+        return
+    seeded = engine.seed_history(bars)
+    typer.echo(f"bootstrap: seeded {seeded} (fetched {len(bars)} bars total)")
 
 
 def _banner(config: PaperTradingConfig) -> None:
@@ -82,6 +106,13 @@ def run(
     confirm: str = typer.Option(None, "--confirm", help=f'Must equal "{_ARM_PHRASE}" to arm.'),
     ws_url: str = typer.Option("wss://stream.bybit.com/v5/public/linear", "--ws-url"),
     max_reconnects: int = typer.Option(None, "--max-reconnects"),
+    bootstrap_bars: int = typer.Option(
+        250,
+        "--bootstrap-bars",
+        help="Closed candles to fetch (public REST) to seed feature history on "
+        "the live feed. Must cover the longest feature lookback (ETH needs 121). "
+        "0 disables bootstrap.",
+    ),
 ) -> None:
     execution_enabled = _resolve_execution(arm_execution, confirm)
     manifest = json.loads(manifest_path.read_text())
@@ -124,6 +155,13 @@ def run(
             typer.echo(f"replay: {len(bars)} bars across {len(replay_csv)} file(s)")
             asyncio.run(engine.run(ReplayFeed(bars)))
         else:
+            if bootstrap_bars > 0:
+                _bootstrap_live_history(
+                    engine=engine,
+                    symbols=list(chosen),
+                    interval=interval,
+                    n_bars=bootstrap_bars,
+                )
             stream = BybitKlineStream(
                 url=ws_url,
                 symbols=list(chosen),
