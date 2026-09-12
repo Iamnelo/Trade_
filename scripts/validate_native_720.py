@@ -28,11 +28,9 @@ REQUIRED_COLUMNS = {
 
 
 def validate_symbol(root: Path, symbol: str) -> dict[str, Any]:
-    files = sorted(root.glob(f"**/{symbol}/interval=720/**/*.parquet"))
+    files = sorted(root.glob(f"raw/bybit_kline/bybit/linear/{symbol}/720/**/*.parquet"))
     if not files:
-        files = sorted(root.glob(f"**/*{symbol}*720*.parquet"))
-    if not files:
-        raise ValueError(f"No interval=720 parquet files found for {symbol}")
+        raise ValueError(f"No native 720 parquet files found for {symbol}")
 
     rows: list[dict[str, Any]] = []
     for path in files:
