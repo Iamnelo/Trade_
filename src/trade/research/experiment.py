@@ -114,6 +114,7 @@ class RobustnessGateSpec:
     """Hard-fail rules; an experiment that fails ANY of these is 'rejected'."""
 
     max_fold_drawdown_pct: float = 25.0
+    min_mean_cost_adjusted_sharpe: float = 0.0
     min_pct_folds_positive_cas: float = 0.5
     min_fills_per_fold: int = 0
     min_folds_with_trades: int = 1
