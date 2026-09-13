@@ -24,13 +24,17 @@ def main() -> None:
 
     git_sha = args.code_git_sha or current_git_sha(cwd=REPO_ROOT)
     lock_sha = lockfile_sha(args.lockfile) if args.lockfile.exists() else "no-lockfile"
-    args.out_root.mkdir(parents=True, exist_ok=True)
+    spec_path = args.spec.resolve()
+    out_root = args.out_root.resolve()
+    manifest_path = args.manifest.resolve()
+
+    out_root.mkdir(parents=True, exist_ok=True)
     entry = freeze_one(
-        spec_path=args.spec,
+        spec_path=spec_path,
         code_git_sha=git_sha,
         lockfile_sha_str=lock_sha,
         data_root=REPO_ROOT,
-        out_root=args.out_root,
+        out_root=out_root,
     )
     manifest = {
         "frozen_at": datetime.now(tz=UTC).isoformat(),
@@ -39,9 +43,9 @@ def main() -> None:
         "note": "Provisional shadow challenger; simulated paper execution only.",
         "winners": [entry],
     }
-    args.manifest.parent.mkdir(parents=True, exist_ok=True)
-    args.manifest.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
-    print(f"wrote {args.manifest.relative_to(REPO_ROOT)}")
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    print(f"wrote {manifest_path.relative_to(REPO_ROOT)}")
 
 
 if __name__ == "__main__":
