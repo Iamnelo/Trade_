@@ -1,4 +1,4 @@
-name: Validate native 720 candles
+name: Validate offline 12H candles
 
 on:
   workflow_dispatch:
@@ -7,13 +7,13 @@ permissions:
   contents: read
 
 concurrency:
-  group: native-720-validation
+  group: offline-12h-validation
   cancel-in-progress: false
 
 jobs:
-  validate-public-data:
+  resample-and-validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -23,62 +23,34 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install uv
-        run: pip install --upgrade "uv>=0.5"
-
-      - name: Install locked dependencies
-        run: uv sync --frozen
-
-      - name: Define isolated validation window
+      - name: Resample committed hourly data and validate
         run: |
-          echo "START_UTC=$(date -u -d '14 days ago' +%Y-%m-%dT00:00:00+00:00)" >> "$GITHUB_ENV"
-          echo "END_UTC=$(date -u +%Y-%m-%dT00:00:00+00:00)" >> "$GITHUB_ENV"
-
-      - name: Fetch native BTCUSDT 720 candles
-        run: |
-          uv run python -m trade.cli backfill bybit \
-            --symbol BTCUSDT \
-            --interval 720 \
-            --start "$START_UTC" \
-            --end "$END_UTC" \
-            --local-dir native-720
-
-      - name: Fetch native ETHUSDT 720 candles
-        run: |
-          uv run python -m trade.cli backfill bybit \
-            --symbol ETHUSDT \
-            --interval 720 \
-            --start "$START_UTC" \
-            --end "$END_UTC" \
-            --local-dir native-720
-
-      - name: Validate native candle artifacts
-        run: |
-          uv run python scripts/validate_native_720.py \
-            --root native-720 \
-            --output native-720/validation-report.json \
-            BTCUSDT ETHUSDT
+          python scripts/resample_hourly_to_12h.py \
+            --output-dir offline-12h \
+            --report offline-12h/validation-report.json
 
       - name: Add report to workflow summary
         if: always()
         run: |
           {
-            echo "## Native 720 candle validation"
+            echo "## Offline 12H data validation"
+            echo
+            echo "This run uses the committed hourly CSVs. It does not contain native 720 data."
             echo
             echo '~~~json'
-            if [ -f native-720/validation-report.json ]; then
-              cat native-720/validation-report.json
+            if [ -f offline-12h/validation-report.json ]; then
+              cat offline-12h/validation-report.json
             else
               echo '{"passed": false, "error": "validation report was not produced"}'
             fi
             echo '~~~'
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Upload isolated data and report
+      - name: Upload resampled data and report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: native-720-validation
-          path: native-720/
+          name: offline-12h-validation
+          path: offline-12h/
           if-no-files-found: warn
           retention-days: 7
