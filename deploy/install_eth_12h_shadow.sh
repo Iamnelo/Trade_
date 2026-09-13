@@ -20,13 +20,13 @@ else
   exit 2
 fi
 
-if [[ -n "$DAILY_REPO" && "$REPO_ROOT" == "$(realpath "$DAILY_REPO")" ]]; then
+if [[ -n "$DAILY_REPO" && "$REPO_ROOT" == "$DAILY_REPO" ]]; then
   echo "REFUSING: install from a separate clone, not the Daily V1 repository: $DAILY_REPO" >&2
   exit 2
 fi
 
-if [[ ! -x "$LAUNCHER" ]]; then
-  echo "missing executable launcher: $LAUNCHER" >&2
+if [[ ! -f "$LAUNCHER" ]]; then
+  echo "missing launcher: $LAUNCHER" >&2
   exit 2
 fi
 
