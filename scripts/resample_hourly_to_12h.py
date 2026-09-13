@@ -1,4 +1,4 @@
-"""Resample committed hourly OHLCV files into aligned 12-hour research candles.
+"""Resample committed hourly OHLCV files into aligned research candles.
 
 Data transformation and quality reporting only: no models, signals, positions,
 fills, exchange requests, credentials, or running services are involved.
@@ -15,7 +15,6 @@ from pathlib import Path
 from typing import Any
 
 HOUR_MS = 60 * 60 * 1000
-TWELVE_HOURS_MS = 12 * HOUR_MS
 FIELDS = ("event_time_ms", "open", "high", "low", "close", "volume", "turnover")
 
 
@@ -47,17 +46,18 @@ def _iso(timestamp_ms: int) -> str:
     return datetime.fromtimestamp(timestamp_ms / 1000, tz=UTC).isoformat()
 
 
-def _resample(rows: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], int]:
+def _resample(rows: list[dict[str, Any]], *, hours: int) -> tuple[list[dict[str, Any]], int]:
+    interval_ms = hours * HOUR_MS
     buckets: dict[int, list[dict[str, Any]]] = defaultdict(list)
     for row in rows:
-        start = row["event_time_ms"] // TWELVE_HOURS_MS * TWELVE_HOURS_MS
+        start = row["event_time_ms"] // interval_ms * interval_ms
         buckets[start].append(row)
 
     complete: list[dict[str, Any]] = []
     dropped = 0
     for start, group in sorted(buckets.items()):
         group.sort(key=lambda row: row["event_time_ms"])
-        expected = [start + index * HOUR_MS for index in range(12)]
+        expected = [start + index * HOUR_MS for index in range(hours)]
         observed = [row["event_time_ms"] for row in group]
         if observed != expected:
             dropped += 1
@@ -101,17 +101,17 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         writer.writerows(rows)
 
 
-def process_symbol(symbol: str, source: Path, output_dir: Path) -> dict[str, Any]:
+def process_symbol(symbol: str, source: Path, output_dir: Path, *, hours: int) -> dict[str, Any]:
     hourly, duplicates = _load_hourly(source)
-    twelve_hour, dropped = _resample(hourly)
-    if not twelve_hour:
-        raise ValueError(f"{source}: no complete 12-hour blocks")
+    resampled, dropped = _resample(hourly, hours=hours)
+    if not resampled:
+        raise ValueError(f"{source}: no complete {hours}-hour blocks")
 
-    destination = output_dir / f"{symbol}_12H_resampled.csv"
-    _write_csv(destination, twelve_hour)
+    destination = output_dir / f"{symbol}_{hours}H_resampled.csv"
+    _write_csv(destination, resampled)
     hourly_gaps = _gap_count(hourly, HOUR_MS)
-    output_gaps = _gap_count(twelve_hour, TWELVE_HOURS_MS)
-    bad_ohlc = _bad_ohlc_count(twelve_hour)
+    output_gaps = _gap_count(resampled, hours * HOUR_MS)
+    bad_ohlc = _bad_ohlc_count(resampled)
     passed = duplicates == 0 and hourly_gaps == 0 and output_gaps == 0 and bad_ohlc == 0
 
     return {
@@ -120,13 +120,13 @@ def process_symbol(symbol: str, source: Path, output_dir: Path) -> dict[str, Any
         "source_file": str(source),
         "output_file": str(destination),
         "source_hourly_rows": len(hourly),
-        "output_12h_rows": len(twelve_hour),
-        "first_12h_open": _iso(twelve_hour[0]["event_time_ms"]),
-        "last_12h_open": _iso(twelve_hour[-1]["event_time_ms"]),
+        "output_rows": len(resampled),
+        "first_open": _iso(resampled[0]["event_time_ms"]),
+        "last_open": _iso(resampled[-1]["event_time_ms"]),
         "duplicate_hourly_rows": duplicates,
         "hourly_gap_count": hourly_gaps,
-        "incomplete_12h_buckets_dropped": dropped,
-        "output_12h_gap_count": output_gaps,
+        "incomplete_buckets_dropped": dropped,
+        "output_gap_count": output_gaps,
         "bad_ohlc_or_volume_rows": bad_ohlc,
     }
 
@@ -135,18 +135,19 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
+    parser.add_argument("--hours", type=int, choices=(4, 12), default=12)
     args = parser.parse_args()
 
     results = [
-        process_symbol("BTCUSDT", Path("BTCUSDT_60_2y.csv"), args.output_dir),
-        process_symbol("ETHUSDT", Path("ETHUSDT_60_2y.csv"), args.output_dir),
+        process_symbol("BTCUSDT", Path("BTCUSDT_60_2y.csv"), args.output_dir, hours=args.hours),
+        process_symbol("ETHUSDT", Path("ETHUSDT_60_2y.csv"), args.output_dir, hours=args.hours),
     ]
-    common_start = max(item["first_12h_open"] for item in results)
-    common_end = min(item["last_12h_open"] for item in results)
+    common_start = max(item["first_open"] for item in results)
+    common_end = min(item["last_open"] for item in results)
     report = {
-        "purpose": "offline hourly-to-12H data-pipeline validation only",
+        "purpose": f"offline hourly-to-{args.hours}H data-pipeline validation only",
         "source": "committed hourly CSV files",
-        "native_720_comparison_performed": False,
+        "native_interval_comparison_performed": False,
         "passed": all(item["passed"] for item in results),
         "common_coverage": {"start": common_start, "end": common_end},
         "symbols": results,
