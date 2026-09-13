@@ -1,0 +1,17 @@
+[Unit]
+Description=Trade ETH 12H shadow paper bot (simulated)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=trade
+WorkingDirectory=/opt/trade
+EnvironmentFile=/etc/trade-paper.env
+Environment=PAPER_12H_JOURNAL_DIR=/opt/trade/paper_journal_eth_12h
+ExecStart=/usr/bin/env bash /opt/trade/scripts/run_paper_eth_12h_shadow.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
