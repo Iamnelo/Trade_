@@ -98,6 +98,18 @@ def test_gate_fails_when_too_few_folds_positive() -> None:
     assert any("pct_folds_positive_cas" in r for r in gate.reasons_failed)
 
 
+def test_gate_rejects_negative_mean_cas_even_with_enough_positive_folds() -> None:
+    reports = [_report(cas=1.0), _report(cas=1.0), _report(cas=-5.0), _report(cas=-5.0)]
+    m = compute_robustness(reports, bars_per_year=365, test_bars_per_fold=90)
+    gate = evaluate_gates(
+        m,
+        gates=RobustnessGateSpec(min_pct_folds_positive_cas=0.5),
+        fold_reports=reports,
+    )
+    assert gate.passed is False
+    assert any("mean_cost_adjusted_sharpe" in r for r in gate.reasons_failed)
+
+
 def test_gate_fails_when_too_many_folds_had_no_trades() -> None:
     reports = [_report(cas=0.0, n_fills=0) for _ in range(6)]
     m = compute_robustness(reports, bars_per_year=8760, test_bars_per_fold=1440)
