@@ -4,14 +4,23 @@
 set -euo pipefail
 
 SERVICE_NAME="trade-paper-eth-12h.service"
-DAILY_REPO="$(realpath "$HOME/trading-bot")"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DEPLOY_USER="$(id -un)"
 UNIT_PATH="/etc/systemd/system/$SERVICE_NAME"
 LAUNCHER="$REPO_ROOT/scripts/run_paper_eth_12h_shadow.sh"
 MANIFEST="$REPO_ROOT/artifacts/frozen/eth_12h_challenger/freeze_manifest.json"
+DAILY_REPO="$(systemctl show trade-paper.service --property=WorkingDirectory --value 2>/dev/null || true)"
 
-if [[ "$REPO_ROOT" == "$DAILY_REPO" ]]; then
+if command -v uv >/dev/null 2>&1; then
+  UV_BIN="$(command -v uv)"
+elif [[ -x /home/whyfavour/.local/bin/uv ]]; then
+  UV_BIN="/home/whyfavour/.local/bin/uv"
+else
+  echo "missing uv executable; install uv for $DEPLOY_USER before deploying" >&2
+  exit 2
+fi
+
+if [[ -n "$DAILY_REPO" && "$REPO_ROOT" == "$(realpath "$DAILY_REPO")" ]]; then
   echo "REFUSING: install from a separate clone, not the Daily V1 repository: $DAILY_REPO" >&2
   exit 2
 fi
@@ -28,7 +37,7 @@ fi
 
 daily_before="$(systemctl is-active trade-paper.service 2>/dev/null || true)"
 
-uv sync --frozen
+"$UV_BIN" sync --frozen
 
 unit_file="$(mktemp)"
 trap 'rm -f "$unit_file"' EXIT
@@ -44,6 +53,7 @@ User=$DEPLOY_USER
 WorkingDirectory=$REPO_ROOT
 EnvironmentFile=-/etc/trade-paper.env
 Environment=PAPER_12H_JOURNAL_DIR=$REPO_ROOT/paper_journal_eth_12h
+Environment=PATH=$(dirname "$UV_BIN"):/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ExecStart=/usr/bin/env bash $LAUNCHER
 Restart=on-failure
 RestartSec=5
