@@ -8,6 +8,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from freeze_winners import freeze_one
+
 from trade.reproducibility.git import current_git_sha, lockfile_sha
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -19,7 +20,9 @@ def main() -> None:
     parser.add_argument("--out-root", type=Path, required=True)
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--lockfile", type=Path, default=REPO_ROOT / "uv.lock")
-    parser.add_argument("--code-git-sha", help="Published source commit SHA; defaults to local HEAD")
+    parser.add_argument(
+        "--code-git-sha", help="Published source commit SHA; defaults to local HEAD"
+    )
     args = parser.parse_args()
 
     git_sha = args.code_git_sha or current_git_sha(cwd=REPO_ROOT)
