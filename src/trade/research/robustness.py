@@ -145,6 +145,11 @@ def evaluate_gates(
             f"max_fold_drawdown_pct={metrics.max_fold_drawdown_pct:.2f} "
             f"> {gates.max_fold_drawdown_pct:.2f}"
         )
+    if metrics.mean_cost_adjusted_sharpe < gates.min_mean_cost_adjusted_sharpe:
+        reasons.append(
+            f"mean_cost_adjusted_sharpe={metrics.mean_cost_adjusted_sharpe:.3f} "
+            f"< {gates.min_mean_cost_adjusted_sharpe:.3f}"
+        )
     if metrics.pct_folds_positive_cas < gates.min_pct_folds_positive_cas:
         reasons.append(
             f"pct_folds_positive_cas={metrics.pct_folds_positive_cas:.2f} "
