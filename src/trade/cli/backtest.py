@@ -27,7 +27,9 @@ from trade.mre.source import MarketReplaySource
 from trade.mre.strategy import Strategy
 from trade.mre.types import BacktestConfig
 from trade.research.oracle import capture_ratio, oracle_max_pnl
+from trade.strategies.bollinger_mean_reversion import BollingerMeanReversionStrategy
 from trade.strategies.buy_hold import BuyAndHoldStrategy
+from trade.strategies.donchian_breakout import DonchianBreakoutStrategy
 from trade.strategies.ma_cross import MACrossStrategy
 from trade.strategies.model_driven import ModelDrivenStrategy
 from trade.strategies.momentum import Momentum12_1Strategy
@@ -45,6 +47,12 @@ _BUILDERS: dict[str, StrategyBuilder] = {
     "ma_cross": lambda symbol, interval: MACrossStrategy(symbol=symbol, interval=interval),
     "momentum": lambda symbol, interval: Momentum12_1Strategy(symbol=symbol, interval=interval),
     "random": lambda symbol, interval: RandomSignalStrategy(symbol=symbol, interval=interval),
+    "bollinger_mean_reversion": lambda symbol, interval: BollingerMeanReversionStrategy(
+        symbol=symbol, interval=interval
+    ),
+    "donchian_breakout": lambda symbol, interval: DonchianBreakoutStrategy(
+        symbol=symbol, interval=interval
+    ),
 }
 
 
@@ -232,6 +240,16 @@ def benchmark_suite(
             fresh_source(symbol),
         ),
         ("random", RandomSignalStrategy(symbol=symbol, interval=interval), fresh_source(symbol)),
+        (
+            "bollinger_mean_reversion",
+            BollingerMeanReversionStrategy(symbol=symbol, interval=interval),
+            fresh_source(symbol),
+        ),
+        (
+            "donchian_breakout",
+            DonchianBreakoutStrategy(symbol=symbol, interval=interval),
+            fresh_source(symbol),
+        ),
     ]
     if include_risk_parity:
         strategies.append(
