@@ -150,7 +150,14 @@ def test_backtest_benchmark_suite_writes_report(tmp_path: Path) -> None:
     assert "strategies" in payload
     assert "oracle" in payload
     keys = {s["key"] for s in payload["strategies"]}
-    assert keys == {"buy_hold", "ma_cross", "momentum", "random"}
+    assert keys == {
+        "bollinger_mean_reversion",
+        "buy_hold",
+        "donchian_breakout",
+        "ma_cross",
+        "momentum",
+        "random",
+    }
     for entry in payload["strategies"]:
         assert "oracle_capture_ratio_long_only" in entry
         assert "report" in entry
