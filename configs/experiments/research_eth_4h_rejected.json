@@ -1,0 +1,56 @@
+{
+  "name": "research_eth_4h_rejected_h18_t075_n6",
+  "data": {
+    "csv_path": "offline-4h/ETHUSDT_4H_resampled.csv",
+    "symbol": "ETHUSDT",
+    "interval": "240"
+  },
+  "features": [
+    "log_return@5",
+    "realized_vol@20",
+    "atr@14",
+    "macd_hist@12_26_9",
+    "rsi_close@14",
+    "vol_regime@20_120"
+  ],
+  "label": {
+    "kind": "triple_barrier",
+    "horizon_bars": 18,
+    "up_pct": 0.03,
+    "down_pct": 0.03,
+    "mode": "2class_directional"
+  },
+  "model": {
+    "n_estimators": 150,
+    "learning_rate": 0.03,
+    "num_leaves": 15,
+    "min_data_in_leaf": 20,
+    "max_depth": -1,
+    "calibration_fraction": 0.2
+  },
+  "strategy": {
+    "confidence_threshold": 0.75,
+    "notional_fraction": 0.35,
+    "allow_short": true
+  },
+  "wfo": {
+    "train_bars": 2190,
+    "test_bars": 540,
+    "step_bars": 540,
+    "expanding": false
+  },
+  "backtest": {
+    "initial_equity": 10000.0,
+    "fee_bps": 5.5,
+    "slippage_bps": 5.0,
+    "bars_per_year": 2190
+  },
+  "gates": {
+    "max_fold_drawdown_pct": 15.0,
+    "min_mean_cost_adjusted_sharpe": 0.0,
+    "min_pct_folds_positive_cas": 0.6,
+    "min_fills_per_fold": 0,
+    "min_folds_with_trades": 3,
+    "max_annualized_turnover": 20.0
+  }
+}

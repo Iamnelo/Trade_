@@ -1,0 +1,32 @@
+{
+  "artifact_kind": "2class_directional",
+  "calibration_rows": 819,
+  "calibrator_present": true,
+  "feature_ids": [
+    "log_return@5",
+    "realized_vol@20",
+    "atr@14",
+    "macd_hist@12_26_9",
+    "rsi_close@14",
+    "vol_regime@20_120"
+  ],
+  "manifest_version": 1,
+  "model_config": {
+    "calibration_fraction": 0.2,
+    "model": {
+      "deterministic": true,
+      "force_row_wise": true,
+      "learning_rate": 0.03,
+      "max_depth": -1,
+      "min_data_in_leaf": 20,
+      "n_estimators": 150,
+      "num_leaves": 15,
+      "objective": "binary",
+      "random_state": 42,
+      "verbose": -1
+    }
+  },
+  "reproducibility_hash": "2ee9be083f78687084a95645c530527a180e04b4d1d2d979ebd8abdb6f1bb1b6",
+  "saved_at": "2026-09-21T11:12:17.408136+00:00",
+  "train_rows": 3274
+}

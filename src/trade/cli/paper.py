@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -29,6 +30,7 @@ from trade.paper.feed import ReplayFeed
 from trade.paper.journal import PaperJournal
 from trade.paper.notifier import (
     BackgroundNotifier,
+    PrefixNotifier,
     TelegramNotifier,
     build_notifier,
     log_notifier_status,
@@ -141,7 +143,12 @@ def run(
             "telegram: NOT configured — set TRADE_TELEGRAM_BOT_TOKEN and "
             "TRADE_TELEGRAM_CHAT_ID (notifications disabled)"
         )
-    notifier = BackgroundNotifier(build_notifier(config.telegram))
+    base_notifier = build_notifier(config.telegram)
+    telegram_prefix = os.environ.get("TRADE_TELEGRAM_PREFIX", "").strip()
+    if telegram_prefix:
+        typer.echo(f"telegram: message prefix [{telegram_prefix}]")
+        base_notifier = PrefixNotifier(base_notifier, telegram_prefix)
+    notifier = BackgroundNotifier(base_notifier)
     engine = PaperTradingEngine(config=config, bundles=bundles, journal=journal, notifier=notifier)
 
     interval = bundles[0].interval

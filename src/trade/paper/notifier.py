@@ -52,6 +52,24 @@ class NullNotifier:
         return True
 
 
+class PrefixNotifier:
+    """Add a visible strategy label to every notification.
+
+    Multiple isolated paper services may share one Telegram bot/chat.  A
+    prefix keeps their lifecycle, decision, fill, and report messages from
+    being confused with each other without changing trading behaviour.
+    """
+
+    def __init__(self, inner: Notifier, prefix: str) -> None:
+        self._inner = inner
+        self._prefix = prefix.strip()
+
+    def notify(self, text: str) -> bool:
+        if not self._prefix:
+            return self._inner.notify(text)
+        return self._inner.notify(f"[{self._prefix}]\n{text}")
+
+
 def _urllib_transport(url: str, body: dict[str, object]) -> None:
     if not url.startswith("https://"):  # defensive: only the Telegram HTTPS API
         raise ValueError("telegram transport requires an https URL")

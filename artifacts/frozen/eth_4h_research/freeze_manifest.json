@@ -1,0 +1,42 @@
+{
+  "frozen_at": "2026-09-21T11:12:17.411722+00:00",
+  "code_git_sha": "6611b878680745e08a55433fc8deb60247ba361b",
+  "lockfile_sha": "9750eaffca2c952090be8a24a3176cb3b3eaf8da2eb4e50c54d29f43d130b436",
+  "note": "Provisional shadow challenger; simulated paper execution only.",
+  "winners": [
+    {
+      "symbol": "ETHUSDT",
+      "spec_name": "research_eth_4h_rejected_h18_t075_n6",
+      "spec_path": "configs/experiments/research_eth_4h_rejected.json",
+      "spec_fingerprint": "258d29ffbbc42b90835ceb5e02a2a9fe7ce786652f2c70eeb0bfc95a988f72df",
+      "interval": "240",
+      "artifacts_dir": "artifacts/frozen/eth_4h_research/research_eth_4h_rejected_h18_t075_n6",
+      "reproducibility_hash": "2ee9be083f78687084a95645c530527a180e04b4d1d2d979ebd8abdb6f1bb1b6",
+      "label_mode": "2class_directional",
+      "label_horizon_bars": 18,
+      "label_up_pct": 0.03,
+      "label_down_pct": 0.03,
+      "feature_ids": [
+        "log_return@5",
+        "realized_vol@20",
+        "atr@14",
+        "macd_hist@12_26_9",
+        "rsi_close@14",
+        "vol_regime@20_120"
+      ],
+      "confidence_threshold": 0.75,
+      "notional_fraction": 0.35,
+      "allow_short": true,
+      "bars_per_year": 2190,
+      "fee_bps": 5.5,
+      "slippage_bps": 5.0,
+      "initial_equity": 10000.0,
+      "n_train_labels": 4093,
+      "train_rows": 3274,
+      "calibration_rows": 819,
+      "cutoff_event_time": "2026-08-05T20:00:00+00:00",
+      "last_bar_event_time": "2026-08-05T20:00:00+00:00",
+      "n_bars_through_cutoff": 4380
+    }
+  ]
+}

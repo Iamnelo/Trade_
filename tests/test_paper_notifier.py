@@ -3,13 +3,27 @@
 from __future__ import annotations
 
 from trade.paper.config import TelegramConfig
-from trade.paper.notifier import NullNotifier, TelegramNotifier, build_notifier
+from trade.paper.notifier import NullNotifier, PrefixNotifier, TelegramNotifier, build_notifier
 
 
 def test_null_notifier_records_messages() -> None:
     n = NullNotifier()
     assert n.notify("hello") is True
     assert n.messages == ["hello"]
+
+
+def test_prefix_notifier_labels_messages() -> None:
+    inner = NullNotifier()
+    n = PrefixNotifier(inner, "RESEARCH 4H")
+    assert n.notify("decision") is True
+    assert inner.messages == ["[RESEARCH 4H]\ndecision"]
+
+
+def test_prefix_notifier_ignores_empty_prefix() -> None:
+    inner = NullNotifier()
+    n = PrefixNotifier(inner, "  ")
+    assert n.notify("decision") is True
+    assert inner.messages == ["decision"]
 
 
 def test_telegram_notifier_posts_via_transport() -> None:
