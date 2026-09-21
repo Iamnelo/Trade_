@@ -47,10 +47,13 @@ class BollingerMeanReversionStrategy:
     ) -> list[TargetPosition]:
         if bar.symbol != self._symbol:
             return []
-        history = source.history(self._symbol, self._interval, lookback=self._window)
-        if len(history) < self._window:
+        history = source.history(self._symbol, self._interval, lookback=self._window + 1)
+        if len(history) < self._window + 1:
             return []
-        closes = [item.close for item in history]
+        # Build the reference band from completed bars strictly before the
+        # decision bar.  Including the current close would pull the band toward
+        # the signal and make the comparison internally contaminated.
+        closes = [item.close for item in history[:-1]]
         mean = sum(closes) / len(closes)
         variance = sum((close - mean) ** 2 for close in closes) / len(closes)
         band = self._num_std * sqrt(variance)
