@@ -33,7 +33,7 @@ install_service() {
   local launcher="$REPO_ROOT/scripts/run_paper_eth_${timeframe}_research.sh"
   local manifest="$REPO_ROOT/artifacts/frozen/eth_${timeframe}_research/freeze_manifest.json"
   local journal="$REPO_ROOT/paper_journal_eth_${timeframe}_research"
-  local prefix="RESEARCH ${timeframe^^} - REJECTED CANDIDATE"
+  local prefix="RESEARCH-${timeframe^^}-REJECTED-CANDIDATE"
   local unit_file
 
   if [[ ! -f "$launcher" || ! -f "$manifest" ]]; then
@@ -53,7 +53,7 @@ Type=simple
 User=$DEPLOY_USER
 WorkingDirectory=$REPO_ROOT
 EnvironmentFile=-$DAILY_ENV_FILE
-Environment="TRADE_TELEGRAM_PREFIX=$prefix"
+Environment=TRADE_TELEGRAM_PREFIX=$prefix
 Environment=PAPER_${timeframe^^}_RESEARCH_JOURNAL_DIR=$journal
 Environment=PATH=$(dirname "$UV_BIN"):/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ExecStart=/usr/bin/env bash $launcher
@@ -71,8 +71,10 @@ EOF
 install_service "4h"
 install_service "1h"
 sudo systemctl daemon-reload
-sudo systemctl enable --now trade-paper-eth-4h-research.service
-sudo systemctl enable --now trade-paper-eth-1h-research.service
+sudo systemctl enable trade-paper-eth-4h-research.service
+sudo systemctl enable trade-paper-eth-1h-research.service
+sudo systemctl restart trade-paper-eth-4h-research.service
+sudo systemctl restart trade-paper-eth-1h-research.service
 
 daily_after="$(systemctl is-active trade-paper.service 2>/dev/null || true)"
 hour12_after="$(systemctl is-active trade-paper-eth-12h.service 2>/dev/null || true)"
