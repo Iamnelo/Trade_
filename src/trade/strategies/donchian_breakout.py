@@ -39,11 +39,14 @@ class DonchianBreakoutStrategy:
     ) -> list[TargetPosition]:
         if bar.symbol != self._symbol:
             return []
-        history = source.history(self._symbol, self._interval, lookback=self._window)
-        if len(history) < self._window:
+        history = source.history(self._symbol, self._interval, lookback=self._window + 1)
+        if len(history) < self._window + 1:
             return []
-        high = max(item.high for item in history)
-        low = min(item.low for item in history)
+        # A breakout must be measured against the *previous* channel.  The
+        # current candle cannot define the boundary it is attempting to break.
+        reference = history[:-1]
+        high = max(item.high for item in reference)
+        low = min(item.low for item in reference)
         if bar.close > high:
             direction = 1.0
         elif bar.close < low and self._allow_short:
