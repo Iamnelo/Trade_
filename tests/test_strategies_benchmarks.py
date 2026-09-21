@@ -11,6 +11,8 @@ from trade.mre.backtest import run_backtest
 from trade.mre.clock import SimClock
 from trade.mre.source import MarketReplaySource
 from trade.mre.types import BacktestConfig, PortfolioSnapshot
+from trade.strategies.bollinger_mean_reversion import BollingerMeanReversionStrategy
+from trade.strategies.donchian_breakout import DonchianBreakoutStrategy
 from trade.strategies.ma_cross import MACrossStrategy
 from trade.strategies.momentum import Momentum12_1Strategy
 from trade.strategies.random_signal import RandomSignalStrategy
@@ -125,6 +127,39 @@ def test_momentum_rejects_bad_params() -> None:
         Momentum12_1Strategy(symbol="BTCUSDT", lookback_bars=1)
     with pytest.raises(ValueError):
         Momentum12_1Strategy(symbol="BTCUSDT", skip_bars=-1)
+
+
+# -----------------------------------------------------------------------------
+# Mean reversion and breakout research benchmarks
+# -----------------------------------------------------------------------------
+
+
+def test_bollinger_mean_reversion_uses_prior_band() -> None:
+    prices = [100.0] * 25 + [80.0, 81.0]
+    src = MarketReplaySource(
+        bars=_bars(prices), clock=SimClock(datetime(2024, 1, 1, tzinfo=UTC)), interval="60"
+    )
+    result = run_backtest(
+        source=src,
+        strategy=BollingerMeanReversionStrategy(symbol="BTCUSDT", window=20),
+        config=BacktestConfig(initial_equity=1000.0, fee_bps=0.0, slippage_bps=0.0),
+    )
+    assert len(result.fills) >= 1
+    assert result.fills[0].side.value == "buy"
+
+
+def test_donchian_breakout_uses_prior_channel() -> None:
+    prices = [100.0] * 25 + [110.0, 111.0]
+    src = MarketReplaySource(
+        bars=_bars(prices), clock=SimClock(datetime(2024, 1, 1, tzinfo=UTC)), interval="60"
+    )
+    result = run_backtest(
+        source=src,
+        strategy=DonchianBreakoutStrategy(symbol="BTCUSDT", window=20),
+        config=BacktestConfig(initial_equity=1000.0, fee_bps=0.0, slippage_bps=0.0),
+    )
+    assert len(result.fills) >= 1
+    assert result.fills[0].side.value == "buy"
 
 
 # -----------------------------------------------------------------------------
